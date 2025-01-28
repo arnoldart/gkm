@@ -14,14 +14,4 @@ public class IdleState : State
         base.Enter();
         // _animator.SetTrigger("Idle");
     }
-
-    public override void UpdateLogic()
-    {
-        base.UpdateLogic();
-        
-        if (Input.GetKeyDown(KeyCode.W))
-        {
-            _stateMachine.ChangeState(new WalkState(_stateMachine));
-        }
-    }
 }

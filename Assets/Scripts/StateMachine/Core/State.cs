@@ -1,16 +1,14 @@
-using UnityEngine;
-
-public class State
+public abstract class State
 {
     protected StateMachine _stateMachine;
 
     public State(StateMachine stateMachine)
     {
-        this._stateMachine = stateMachine;
+        _stateMachine = stateMachine;
     }
-    
+
     public virtual void Enter() { }
+    public virtual void Exit() { }
     public virtual void UpdateLogic() { }
     public virtual void UpdatePhysics() { }
-    public virtual void Exit() { }
 }

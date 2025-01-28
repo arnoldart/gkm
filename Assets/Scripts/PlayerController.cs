@@ -2,24 +2,63 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
-    private StateMachine stateMachine;
-    private Animator animator;
+    [SerializeField] private MovementConfig _movementConfig;
+    private InputReader _inputReader;
+    private StateMachine _stateMachine;
+    private Rigidbody _playerRigidbody;
 
     private void Start()
     {
-        animator = GetComponent<Animator>();
-        stateMachine = gameObject.AddComponent<StateMachine>();
+        _inputReader = gameObject.AddComponent<InputReader>();
+        if (_inputReader == null)
+        {
+            Debug.LogError("InputReader belum diset di Inspector!");
+            return;
+        }
 
-        // Set initial state
-        stateMachine.ChangeState(new IdleState(stateMachine));
+        // Inisialisasi Rigidbody
+        _playerRigidbody = GetComponent<Rigidbody>();
+        if (_playerRigidbody == null)
+        {
+            Debug.LogError("Rigidbody tidak ditemukan pada Player!");
+            return;
+        }
+        
+        if (_movementConfig == null)
+        {
+            Debug.LogError("MovementConfig belum diset di Inspector!");
+            return;
+        }
+
+        // Inisialisasi
+        _stateMachine = gameObject.AddComponent<StateMachine>();
+        _stateMachine.ChangeState(new IdleState(_stateMachine));
     }
 
     private void Update()
     {
-        // Example input to trigger attack
-        // if (Input.GetKeyDown(KeyCode.Space))
-        // {
-        //     stateMachine.ChangeState(new AttackState(stateMachine, animator));
-        // }
+        if (_inputReader == null) return;
+
+        Vector2 movement = _inputReader.MovementValue;
+
+        if (movement.magnitude > 0.1f)
+        {
+            if (_inputReader.IsRunning) // Tambahkan event untuk Running
+            {
+                Debug.Log("Running");
+                _stateMachine.ChangeState(new RunningState(_stateMachine, transform, _playerRigidbody, movement, _movementConfig));
+            }
+            else
+            {
+                Debug.Log("Walking");
+                _stateMachine.ChangeState(new WalkState(_stateMachine, transform, _playerRigidbody, movement, _movementConfig));
+            }
+        }
+        else
+        {
+            Debug.Log("Idle");
+            _stateMachine.ChangeState(new IdleState(_stateMachine));
+        }
     }
+
 }
