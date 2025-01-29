@@ -17,3 +17,11 @@ MonoBehaviour:
   rotationSpeed: 15
   movementSmoothTime: 0.1
   rotationSmoothTime: 0.05
+  jumpForce: 8
+  airControlSpeed: 2
+  coyoteTime: 0.2
+  jumpBufferTime: 0.2
+  groundCheckDistance: 1
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 64

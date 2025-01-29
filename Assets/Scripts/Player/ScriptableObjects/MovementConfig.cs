@@ -20,4 +20,12 @@ public class MovementConfig : ScriptableObject
 
     [Tooltip("Smoothing time for rotation transitions.")]
     public float rotationSmoothTime = 0.05f;
+    
+    [Header("Advanced Jump Settings")]
+    public float jumpForce = 8f;
+    public float airControlSpeed = 2f;
+    public float coyoteTime = 0.2f;
+    public float jumpBufferTime = 0.2f;
+    public float groundCheckDistance = 0.1f;
+    public LayerMask groundLayer;
 }

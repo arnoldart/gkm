@@ -8,6 +8,8 @@ public class InputReader : MonoBehaviour, PlayerInputActions.IGameplayActions
     public bool IsRunning { get; private set; }
 
     public event Action AttackEvent;
+    // public event Action RunningEvent;
+    public event Action JumpEvent;
 
     private PlayerInputActions _controls;
 
@@ -37,5 +39,11 @@ public class InputReader : MonoBehaviour, PlayerInputActions.IGameplayActions
     public void OnRunning(InputAction.CallbackContext context)
     {
         IsRunning = context.ReadValueAsButton();
+    }
+
+    public void OnJump(InputAction.CallbackContext context)
+    {
+        if (context.performed)
+            JumpEvent?.Invoke();
     }
 }
