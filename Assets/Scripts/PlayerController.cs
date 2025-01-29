@@ -3,85 +3,81 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour
 {
     [SerializeField] private MovementConfig _movementConfig;
-    public Transform cameraTransform;
+    [SerializeField] private Transform cameraTransform;
+    
     private InputReader _inputReader;
     private StateMachine _stateMachine;
-    private Rigidbody _playerRigidbody;
+    private CharacterController _characterController;
+
+    private Vector2 _currentMovement = Vector2.zero;
+    private bool _isRunning = false;
+
+    private void Awake()
+    {
+        _inputReader = gameObject.AddComponent<InputReader>();
+        _characterController = GetComponent<CharacterController>();
+
+        ValidateComponents();
+
+        _stateMachine = gameObject.AddComponent<StateMachine>();
+    }
 
     private void Start()
     {
-        _inputReader = gameObject.AddComponent<InputReader>();
-        if (_inputReader == null)
-        {
-            Debug.LogError("InputReader belum diset di Inspector!");
-            return;
-        }
-
-        _playerRigidbody = GetComponent<Rigidbody>();
-        if (_playerRigidbody == null)
-        {
-            Debug.LogError("Rigidbody tidak ditemukan pada Player!");
-            return;
-        }
-        
-        if (_movementConfig == null)
-        {
-            Debug.LogError("MovementConfig belum diset di Inspector!");
-            return;
-        }
-        
-        
-        if (cameraTransform == null)
-        {
-            Debug.LogError("Camera Transform belum diset di Inspector!");
-            return;
-        }
-
-        // Inisialisasi
-        _stateMachine = gameObject.AddComponent<StateMachine>();
         _stateMachine.ChangeState(new IdleState(_stateMachine));
 
-        _inputReader.JumpEvent += OnJump;
+        // Subscribing ke event input
+        _inputReader.MoveEvent += HandleMovementState;
+        _inputReader.RunningEvent += HandleRunningState;
+        _inputReader.JumpEvent += HandleJumpState;
     }
 
-    private void Update()
+    private void OnDestroy()
     {
-        if (_inputReader == null) return;
+        _inputReader.MoveEvent -= HandleMovementState;
+        _inputReader.RunningEvent -= HandleRunningState;
+        _inputReader.JumpEvent -= HandleJumpState;
+    }
 
-        Vector2 movement = _inputReader.MovementValue;
+    private void HandleMovementState(Vector2 movement)
+    {
+        _currentMovement = movement;
 
-        if (movement.magnitude > 0.1f)
+        if (movement.sqrMagnitude > 0.01f)
         {
-            if (_inputReader.IsRunning)
-            {
-                Debug.Log("Running");
-                _stateMachine.ChangeState(new RunningState(_stateMachine, transform, _playerRigidbody, movement, _movementConfig, cameraTransform));
-            }
-            else
-            {
-                Debug.Log("Walking");
-                _stateMachine.ChangeState(new WalkState(_stateMachine, transform, _playerRigidbody, movement, _movementConfig, cameraTransform));
-            }
+            State newState = _isRunning 
+                ? new RunningState(_stateMachine, transform, _characterController, movement, _movementConfig, cameraTransform) 
+                : new WalkState(_stateMachine, transform, _characterController, movement, _movementConfig, cameraTransform);
+            
+            _stateMachine.ChangeState(newState);
         }
         else
         {
-            Debug.Log("Idle");
             _stateMachine.ChangeState(new IdleState(_stateMachine));
         }
     }
 
-    public void OnJump()
+    private void HandleRunningState(bool isRunning)
     {
-        
-        _stateMachine.ChangeState(new JumpState(_stateMachine, transform, _playerRigidbody, _inputReader.MovementValue, _movementConfig, cameraTransform));
-    }
-    
-    private void OnDestroy()
-    {
-        if (_inputReader != null)
-        {
-            _inputReader.JumpEvent -= OnJump;
-        }
+        _isRunning = isRunning;
+        HandleMovementState(_currentMovement); // Update state saat status running berubah
     }
 
+    private void HandleJumpState()
+    {
+        Debug.Log("Testt");
+        // if (_characterController.isGrounded)
+        // {
+        //     Debug.Log("ganti state jumo");
+            _stateMachine.ChangeState(new JumpState(_stateMachine, transform, _characterController, _currentMovement, _movementConfig, cameraTransform));
+        // }
+    }
+
+    private void ValidateComponents()
+    {
+        if (_inputReader == null) Debug.LogError("InputReader belum diset di Inspector!");
+        if (_characterController == null) Debug.LogError("CharacterController tidak ditemukan pada Player!");
+        if (_movementConfig == null) Debug.LogError("MovementConfig belum diset di Inspector!");
+        if (cameraTransform == null) Debug.LogError("Camera Transform belum diset di Inspector!");
+    }
 }

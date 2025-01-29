@@ -4,12 +4,10 @@ using UnityEngine.InputSystem;
 
 public class InputReader : MonoBehaviour, PlayerInputActions.IGameplayActions
 {
-    public Vector2 MovementValue { get; private set; }
-    public bool IsRunning { get; private set; }
-
-    public event Action AttackEvent;
-    // public event Action RunningEvent;
+    public event Action<Vector2> MoveEvent;
+    public event Action<bool> RunningEvent;
     public event Action JumpEvent;
+    public event Action AttackEvent;
 
     private PlayerInputActions _controls;
 
@@ -27,23 +25,24 @@ public class InputReader : MonoBehaviour, PlayerInputActions.IGameplayActions
 
     public void OnMove(InputAction.CallbackContext context)
     {
-        MovementValue = context.ReadValue<Vector2>();
-    }
-
-    public void OnAttack(InputAction.CallbackContext context)
-    {
-        if (context.performed)
-        AttackEvent?.Invoke();
+        if (context.performed || context.canceled)
+            MoveEvent?.Invoke(context.ReadValue<Vector2>());
     }
 
     public void OnRunning(InputAction.CallbackContext context)
     {
-        IsRunning = context.ReadValueAsButton();
+        RunningEvent?.Invoke(context.ReadValueAsButton());
     }
 
     public void OnJump(InputAction.CallbackContext context)
     {
         if (context.performed)
             JumpEvent?.Invoke();
+    }
+
+    public void OnAttack(InputAction.CallbackContext context)
+    {
+        if (context.performed)
+            AttackEvent?.Invoke();
     }
 }
