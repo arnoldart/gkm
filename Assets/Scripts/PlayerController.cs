@@ -65,12 +65,7 @@ public class PlayerController : MonoBehaviour
 
     private void HandleJumpState()
     {
-        Debug.Log("Testt");
-        // if (_characterController.isGrounded)
-        // {
-        //     Debug.Log("ganti state jumo");
-            _stateMachine.ChangeState(new JumpState(_stateMachine, transform, _characterController, _currentMovement, _movementConfig, cameraTransform));
-        // }
+        // _stateMachine.ChangeState(new JumpState(_stateMachine, transform, _characterController, _currentMovement, _movementConfig, cameraTransform));
     }
 
     private void ValidateComponents()

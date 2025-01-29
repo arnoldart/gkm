@@ -25,7 +25,7 @@ public abstract class MovementState : State
 
     public override void UpdatePhysics()
     {
-        CheckGround(); // Memanggil CheckGround untuk memperbarui status grounded
+        CheckGround();
 
         if (_moveInput.sqrMagnitude < 0.01f)
         {
@@ -37,36 +37,30 @@ public abstract class MovementState : State
         MovePlayer(targetDirection);
         RotatePlayer(targetDirection);
     }
-    
-    
-
 
     private void CheckGround()
     {
         RaycastHit hit;
-        Vector3 rayOrigin = _playerTransform.position + Vector3.up * 0.1f; // Mulai raycast sedikit di atas karakter
-        Vector3 rayDirection = Vector3.down; // Arah raycast ke bawah
-        float rayLength = 1.5f; // Panjang raycast
+        Vector3 rayStart = _playerTransform.position + Vector3.up * 0.1f;
+        Vector3 rayDirection = Vector3.down;
+        float rayLength = 1.5f;
 
-        // Cek apakah raycast mengenai tanah
-        _isGrounded = Physics.Raycast(rayOrigin, rayDirection, out hit, rayLength, _config.groundLayer);
+        _isGrounded = Physics.Raycast(rayStart, rayDirection, out hit, rayLength);
 
         if (_isGrounded)
         {
-            _groundNormal = hit.normal; // Simpan normal tanah
+            _groundNormal = hit.normal;
             Debug.DrawRay(hit.point, hit.normal * 1.5f, Color.green); // Debug Normal Tanah
         }
         else
         {
-            _groundNormal = Vector3.up; // Jika tidak di tanah, set normal ke atas
+            _groundNormal = Vector3.up;
         }
 
-        Debug.DrawRay(rayOrigin, rayDirection * rayLength, _isGrounded ? Color.green : Color.red); // Debug Raycast
+        Debug.DrawRay(rayStart, rayDirection * rayLength, _isGrounded ? Color.green : Color.red); // Debug Raycast
     }
 
-
-
-    protected Vector3 CalculateMovementDirection()
+    private Vector3 CalculateMovementDirection()
     {
         Vector3 cameraForward = _cameraTransform.forward;
         Vector3 cameraRight = _cameraTransform.right;
@@ -111,6 +105,4 @@ public abstract class MovementState : State
             _config.rotationSpeed * Time.deltaTime
         );
     }
-    
-    
 }
