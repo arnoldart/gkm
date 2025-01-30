@@ -4,8 +4,12 @@ using UnityEngine.InputSystem;
 
 public class InputReader : MonoBehaviour, PlayerInputActions.IGameplayActions
 {
-    public event Action<Vector2> MoveEvent;
-    public event Action<bool> RunningEvent;
+    public Vector2 MoveInput { get; private set; }
+    public bool IsRunning { get; private set; }
+
+    public event Action RunningEvent;
+    // public event Action<Vector2> MoveEvent;
+    // public event Action<bool> RunningEvent;
     public event Action JumpEvent;
     public event Action AttackEvent;
 
@@ -25,13 +29,13 @@ public class InputReader : MonoBehaviour, PlayerInputActions.IGameplayActions
 
     public void OnMove(InputAction.CallbackContext context)
     {
-        if (context.performed || context.canceled)
-            MoveEvent?.Invoke(context.ReadValue<Vector2>());
+        MoveInput = context.ReadValue<Vector2>();
     }
 
     public void OnRunning(InputAction.CallbackContext context)
     {
-        RunningEvent?.Invoke(context.ReadValueAsButton());
+        IsRunning = context.ReadValueAsButton();
+        Debug.Log($"OnRunning Triggered: {IsRunning}");
     }
 
     public void OnJump(InputAction.CallbackContext context)

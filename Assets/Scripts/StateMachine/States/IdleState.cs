@@ -1,17 +1,28 @@
 using UnityEngine;
 
-public class IdleState : State
+public class IdleState : BaseState
 {
-    // private Animator _animator;
-    
-    public IdleState(StateMachine stateMachine) : base(stateMachine)
-    {
-        // this._animator = animator;
-    }
+    public IdleState(PlayerController stateMachine) : base(stateMachine) {}
 
     public override void Enter()
     {
         base.Enter();
-        // _animator.SetTrigger("Idle");
+    }
+
+    public override void UpdateLogic()
+    {
+        if (stateMachine.InputReader.MoveInput.sqrMagnitude > 0.01f)
+        {
+            if (stateMachine.InputReader.IsRunning)
+            {
+                Debug.Log("Running");
+                stateMachine.ChangeState(new RunningState(stateMachine));
+            }
+            else
+            {
+                Debug.Log("Walking");
+                stateMachine.ChangeState(new WalkState(stateMachine));
+            }
+        }
     }
 }
