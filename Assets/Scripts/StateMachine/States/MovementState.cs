@@ -1,108 +1,47 @@
 using UnityEngine;
 
-public abstract class MovementState : State
+public class MovementState : PlayerBaseState
 {
-    protected readonly Transform _playerTransform;
-    protected readonly CharacterController _characterController;
-    protected readonly Vector2 _moveInput;
-    protected readonly MovementConfig _config;
-    protected readonly Transform _cameraTransform;
-
-    private bool _isGrounded;
-    private Vector3 _groundNormal;
-
-    protected MovementState(StateMachine stateMachine, Transform playerTransform, CharacterController characterController, Vector2 moveInput, MovementConfig config, Transform cameraTransform)
-        : base(stateMachine)
+    public MovementState(PlayerStateMachine stateMachine) : base(stateMachine)
     {
-        _playerTransform = playerTransform;
-        _characterController = characterController;
-        _moveInput = moveInput;
-        _config = config;
-        _cameraTransform = cameraTransform;
     }
 
-    protected abstract float GetSpeed(); // Kecepatan akan diatur di subclass
-
-    public override void UpdatePhysics()
+    public override void UpdateLogic()
     {
-        CheckGround();
+        Vector3 movement = GetCameraAdjustedMovement(); // Gunakan pergerakan relatif kamera
+        float speed = stateMachine.isRunning ? stateMachine.runSpeed : stateMachine.walkSpeed;
 
-        if (_moveInput.sqrMagnitude < 0.01f)
+        ApplyGravity();
+        MoveCharacter(movement, speed);
+
+        // Rotasi karakter sesuai arah gerak
+        if (movement != Vector3.zero)
         {
-            StopMovement();
+            Quaternion targetRotation = Quaternion.LookRotation(movement);
+            stateMachine.transform.rotation = Quaternion.Slerp(
+                stateMachine.transform.rotation,
+                targetRotation,
+                Time.deltaTime * 15f
+            );
+        }
+
+        // Check transitions
+        if (stateMachine.movementInput == Vector3.zero)
+        {
+            stateMachine.ChangeState(new IdleState(stateMachine));
             return;
         }
 
-        Vector3 targetDirection = CalculateMovementDirection();
-        MovePlayer(targetDirection);
-        RotatePlayer(targetDirection);
-    }
-
-    private void CheckGround()
-    {
-        RaycastHit hit;
-        Vector3 rayStart = _playerTransform.position + Vector3.up * 0.1f;
-        Vector3 rayDirection = Vector3.down;
-        float rayLength = 1.5f;
-
-        _isGrounded = Physics.Raycast(rayStart, rayDirection, out hit, rayLength);
-
-        if (_isGrounded)
+        if (stateMachine.jumpTriggered && stateMachine.controller.isGrounded)
         {
-            _groundNormal = hit.normal;
-            Debug.DrawRay(hit.point, hit.normal * 1.5f, Color.green); // Debug Normal Tanah
-        }
-        else
-        {
-            _groundNormal = Vector3.up;
+            stateMachine.ChangeState(new JumpState(stateMachine));
+            stateMachine.jumpTriggered = false;
+            return;
         }
 
-        Debug.DrawRay(rayStart, rayDirection * rayLength, _isGrounded ? Color.green : Color.red); // Debug Raycast
-    }
-
-    private Vector3 CalculateMovementDirection()
-    {
-        Vector3 cameraForward = _cameraTransform.forward;
-        Vector3 cameraRight = _cameraTransform.right;
-
-        cameraForward.y = 0;
-        cameraRight.y = 0;
-
-        Vector3 moveDirection = (cameraRight * _moveInput.x + cameraForward * _moveInput.y).normalized;
-
-        // Jika di tanah, sejajarkan dengan normal tanah
-        return Vector3.ProjectOnPlane(moveDirection, _groundNormal).normalized;
-    }
-
-    private void MovePlayer(Vector3 direction)
-    {
-        float speed = GetSpeed();
-        Vector3 velocity = direction * speed;
-
-        if (_isGrounded)
+        if (!stateMachine.controller.isGrounded)
         {
-            _characterController.Move(velocity * Time.deltaTime);
+            stateMachine.ChangeState(new FallingState(stateMachine));
         }
-        else
-        {
-            _characterController.Move(velocity * Time.deltaTime * 0.98f); // Sedikit tahanan udara
-        }
-    }
-
-    private void StopMovement()
-    {
-        _characterController.Move(Vector3.zero);
-    }
-
-    private void RotatePlayer(Vector3 direction)
-    {
-        if (direction.sqrMagnitude < 0.01f) return;
-
-        Quaternion targetRotation = Quaternion.LookRotation(direction, Vector3.up);
-        _playerTransform.rotation = Quaternion.Slerp(
-            _playerTransform.rotation,
-            targetRotation,
-            _config.rotationSpeed * Time.deltaTime
-        );
     }
 }
