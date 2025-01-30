@@ -1,17 +1,45 @@
 using UnityEngine;
 
-public class IdleState : State
+public class IdleState : PlayerBaseState
 {
-    // private Animator _animator;
-    
-    public IdleState(StateMachine stateMachine) : base(stateMachine)
-    {
-        // this._animator = animator;
-    }
+    public IdleState(PlayerStateMachine stateMachine) : base(stateMachine) {}
 
     public override void Enter()
     {
         base.Enter();
-        // _animator.SetTrigger("Idle");
+
+        stateMachine.verticalVelocity = -2f;
+    }
+
+    public override void UpdateLogic()
+    {
+        base.UpdateLogic();
+        
+        ApplyGravity();
+        MoveCharacter(Vector3.zero, 0);
+
+        // Check transitions
+        if (stateMachine.movementInput != Vector3.zero)
+        {
+            stateMachine.ChangeState(new MovementState(stateMachine));
+            return;
+        }
+
+        if (stateMachine.jumpTriggered && stateMachine.controller.isGrounded)
+        {
+            stateMachine.ChangeState(new JumpState(stateMachine));
+            stateMachine.jumpTriggered = false;
+            return;
+        }
+
+        if (!stateMachine.controller.isGrounded)
+        {
+            stateMachine.ChangeState(new FallingState(stateMachine));
+        }
+    }
+
+    public override void Exit()
+    {
+        base.Exit();
     }
 }

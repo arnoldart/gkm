@@ -22,10 +22,8 @@ public class MovementConfig : ScriptableObject
     public float rotationSmoothTime = 0.05f;
     
     [Header("Advanced Jump Settings")]
-    public float jumpForce = 8f;
-    public float airControlSpeed = 2f;
-    public float coyoteTime = 0.2f;
-    public float jumpBufferTime = 0.2f;
-    public float groundCheckDistance = 0.1f;
+    public float jumpHeight = 2.0f;
+    public float gravity = 9.81f;
+    public float jumpMoveSpeed = 5.0f;
     public LayerMask groundLayer;
 }
