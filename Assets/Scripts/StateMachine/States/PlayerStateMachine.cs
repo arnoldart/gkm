@@ -23,11 +23,14 @@ public class PlayerStateMachine : StateMachine
     public bool jumpTriggered;
     public float verticalVelocity;
 
+    public Animator Animator;
+
     
     private void Start()
     {
         controller = GetComponent<CharacterController>();
         inputHandler = GetComponent<InputHandler>();
+        Animator = GetComponent<Animator>();
         
         if (playerCamera == null)
         {

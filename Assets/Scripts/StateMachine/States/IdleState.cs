@@ -7,6 +7,8 @@ public class IdleState : PlayerBaseState
     public override void Enter()
     {
         base.Enter();
+        
+        stateMachine.Animator.SetBool("isWalk", false);
 
         stateMachine.verticalVelocity = -2f;
     }
@@ -40,6 +42,8 @@ public class IdleState : PlayerBaseState
 
     public override void Exit()
     {
+        stateMachine.Animator.SetBool("isWalk", true);
+        
         base.Exit();
     }
 }

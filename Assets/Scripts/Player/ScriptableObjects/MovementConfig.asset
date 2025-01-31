@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bdff781e068f4c7419e992596a71db49, type: 3}
   m_Name: MovementConfig
   m_EditorClassIdentifier: 
-  walkSpeed: 5
-  runSpeed: 120
+  walkSpeed: 7.6
+  runSpeed: 6
   rotationSpeed: 15
   movementSmoothTime: 0.1
   rotationSmoothTime: 0.05
@@ -22,4 +22,4 @@ MonoBehaviour:
   jumpMoveSpeed: 5
   groundLayer:
     serializedVersion: 2
-    m_Bits: 64
+    m_Bits: 0

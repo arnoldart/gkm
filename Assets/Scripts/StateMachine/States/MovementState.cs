@@ -6,11 +6,28 @@ public class MovementState : PlayerBaseState
     {
     }
 
+    public override void Enter()
+    {
+        stateMachine.Animator.SetBool("isWalk", true);
+        stateMachine.Animator.SetFloat("runspeed", 0);
+        
+        base.Enter();
+    }
+
     public override void UpdateLogic()
     {
         Vector3 movement = GetCameraAdjustedMovement(); // Gunakan pergerakan relatif kamera
         float speed = stateMachine.isRunning ? stateMachine.runSpeed : stateMachine.walkSpeed;
 
+        if (speed > 5f)
+        {
+            stateMachine.Animator.SetFloat("runspeed", 1);
+        }
+        else
+        {
+            stateMachine.Animator.SetFloat("runspeed", 0);
+        }
+        
         ApplyGravity();
         MoveCharacter(movement, speed);
 
