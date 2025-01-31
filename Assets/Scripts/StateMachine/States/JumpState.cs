@@ -7,6 +7,8 @@ public class JumpState : PlayerBaseState
     public override void Enter()
     {
         stateMachine.verticalVelocity = stateMachine.jumpForce;
+        
+        stateMachine.Animator.SetTrigger("jump");
     }
 
     public override void UpdateLogic()
