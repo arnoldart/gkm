@@ -7,6 +7,8 @@ using UnityEngine;
 public class PlayerStateMachine : StateMachine
 {
     [Header("Movement Settings")]
+    public float currentSpeed;
+    public float acceleration = 5f;
     public float walkSpeed = 5f;
     public float runSpeed = 10f;
     public float jumpForce = 8f;

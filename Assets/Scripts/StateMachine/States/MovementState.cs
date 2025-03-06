@@ -10,6 +10,7 @@ public class MovementState : PlayerBaseState
     {
         stateMachine.Animator.SetBool("isWalk", true);
         stateMachine.Animator.SetFloat("runspeed", 0);
+        stateMachine.currentSpeed = 0;
         
         base.Enter();
     }
@@ -17,19 +18,24 @@ public class MovementState : PlayerBaseState
     public override void UpdateLogic()
     {
         Vector3 movement = GetCameraAdjustedMovement(); // Gunakan pergerakan relatif kamera
-        float speed = stateMachine.isRunning ? stateMachine.runSpeed : stateMachine.walkSpeed;
+        float targetSpeed = stateMachine.isRunning ? stateMachine.runSpeed : stateMachine.walkSpeed;
+        stateMachine.currentSpeed = Mathf.Lerp(stateMachine.currentSpeed, targetSpeed, Time.deltaTime * stateMachine.acceleration);
 
-        if (speed > 5f)
-        {
-            stateMachine.Animator.SetFloat("runspeed", 1);
-        }
-        else
-        {
-            stateMachine.Animator.SetFloat("runspeed", 0);
-        }
+        float targetRunSpeed = stateMachine.currentSpeed > 5f ? 1f : 0f;
+        float currentRunSpeed = stateMachine.Animator.GetFloat("runspeed");
+        stateMachine.Animator.SetFloat("runspeed", Mathf.Lerp(currentRunSpeed, targetRunSpeed, Time.deltaTime * stateMachine.acceleration));
+        
+        // if (stateMachine.currentSpeed > 5f)
+        // {
+        //     stateMachine.Animator.SetFloat("runspeed", 1);
+        // }
+        // else
+        // {
+        //     stateMachine.Animator.SetFloat("runspeed", 0);
+        // }
         
         ApplyGravity();
-        MoveCharacter(movement, speed);
+        MoveCharacter(movement, stateMachine.currentSpeed);
 
         // Rotasi karakter sesuai arah gerak
         if (movement != Vector3.zero)
