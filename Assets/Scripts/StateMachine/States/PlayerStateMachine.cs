@@ -9,11 +9,15 @@ public class PlayerStateMachine : StateMachine
     [Header("Movement Settings")]
     public float currentSpeed;
     public float acceleration = 5f;
-    public float walkSpeed = 5f;
-    public float runSpeed = 10f;
+    public float walkSpeed;
+    public float slowRunSpeed;
+    public float runSpeed;
     public float jumpForce = 8f;
     public float gravity = -25f;
     public float airControl = 3f;
+    public bool walkScene = false;
+    public bool runScene = false;
+    public bool isRunning;
 
     [Header("References")]
     public CharacterController controller;
@@ -21,7 +25,6 @@ public class PlayerStateMachine : StateMachine
     public Camera playerCamera;
 
     public Vector3 movementInput;
-    public bool isRunning;
     public bool jumpTriggered;
     public float verticalVelocity;
 

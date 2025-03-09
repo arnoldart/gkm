@@ -14,12 +14,15 @@ public class InputReader : MonoBehaviour, PlayerInputActions.IGameplayActions
     public event Action AttackEvent;
 
     private PlayerInputActions _controls;
+    private PlayerStateMachine _stateMachine;
 
     private void Start()
     {
         _controls = new PlayerInputActions();
         _controls.Gameplay.SetCallbacks(this);
         _controls.Gameplay.Enable();
+
+        _stateMachine = GetComponent<PlayerStateMachine>();
     }
 
     private void OnDestroy()
@@ -35,7 +38,6 @@ public class InputReader : MonoBehaviour, PlayerInputActions.IGameplayActions
     public void OnRunning(InputAction.CallbackContext context)
     {
         IsRunning = context.ReadValueAsButton();
-        Debug.Log($"OnRunning Triggered: {IsRunning}");
     }
 
     public void OnJump(InputAction.CallbackContext context)
