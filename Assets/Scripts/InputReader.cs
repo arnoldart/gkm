@@ -6,23 +6,16 @@ public class InputReader : MonoBehaviour, PlayerInputActions.IGameplayActions
 {
     public Vector2 MoveInput { get; private set; }
     public bool IsRunning { get; private set; }
-
-    public event Action RunningEvent;
-    // public event Action<Vector2> MoveEvent;
-    // public event Action<bool> RunningEvent;
-    public event Action JumpEvent;
-    public event Action AttackEvent;
+    public bool JumpTriggered { get; private set; }
+    public bool AttackTriggered { get; private set; }
 
     private PlayerInputActions _controls;
-    private PlayerStateMachine _stateMachine;
 
-    private void Start()
+    private void Awake()
     {
         _controls = new PlayerInputActions();
         _controls.Gameplay.SetCallbacks(this);
         _controls.Gameplay.Enable();
-
-        _stateMachine = GetComponent<PlayerStateMachine>();
     }
 
     private void OnDestroy()
@@ -43,17 +36,23 @@ public class InputReader : MonoBehaviour, PlayerInputActions.IGameplayActions
     public void OnJump(InputAction.CallbackContext context)
     {
         if (context.performed)
-            JumpEvent?.Invoke();
+            JumpTriggered = true;
     }
 
     public void OnLook(InputAction.CallbackContext context)
     {
-        
+        // Implement look logic if needed
     }
 
     public void OnAttack(InputAction.CallbackContext context)
     {
         if (context.performed)
-            AttackEvent?.Invoke();
+            AttackTriggered = true;
+    }
+
+    public void ResetFlags()
+    {
+        JumpTriggered = false;
+        AttackTriggered = false;
     }
 }

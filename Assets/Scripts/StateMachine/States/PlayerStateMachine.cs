@@ -16,7 +16,7 @@ public class PlayerStateMachine : StateMachine
     public float gravity = -25f;
     public float airControl = 3f;
     public bool walkScene = false;
-    public bool runScene = false;
+    public bool runScene = true;
     public bool isRunning;
 
     [Header("References")]
@@ -43,6 +43,11 @@ public class PlayerStateMachine : StateMachine
         }
         
         ChangeState(new IdleState(this));
+    }
+
+    private void OnDestroy()
+    {
+        
     }
 
     // private void Update()
