@@ -21,66 +21,10 @@ public class MovementState : PlayerBaseState
         float targetSpeed = stateMachine.isRunning ? stateMachine.runSpeed : GetTargetSpeed();
         stateMachine.currentSpeed = Mathf.Lerp(stateMachine.currentSpeed, targetSpeed, Time.deltaTime * stateMachine.acceleration);
 
-        // float targetRunSpeed = stateMachine.currentSpeed > 5f ? 1f : 0f;
-
-        float targetRunSpeed;
-
-        if (stateMachine.currentSpeed >= stateMachine.slowRunSpeed &&
-            stateMachine.currentSpeed <= stateMachine.runSpeed)
-        {
-            targetRunSpeed = 2f;
-        }else if (stateMachine.currentSpeed <= stateMachine.slowRunSpeed &&
-                  stateMachine.currentSpeed >= stateMachine.walkSpeed && stateMachine.walkScene == false)
-        {
-            targetRunSpeed = 1f;
-        }
-        else
-        {
-            targetRunSpeed = 0f;
-        }
-
-        // switch (stateMachine.currentSpeed)
-        // {
-        //     case float speed when speed >= stateMachine.runSpeed && stateMachine.isRunning:
-        //         targetRunSpeed = 2f;
-        //         break;
-        //     case float speed when speed >= stateMachine.slowRunSpeed :
-        //         targetRunSpeed = 1f;
-        //         break;
-        //     case float speed when speed <= stateMachine.walkSpeed && !stateMachine.walkScene:
-        //         targetRunSpeed = 0f;
-        //         break;
-        //     default:
-        //         targetRunSpeed = 1f;
-        //         break;
-        // }
-        
-        //
-        //
-        // if (stateMachine.currentSpeed >= stateMachine.runSpeed)
-        // {
-        //     targetRunSpeed = 1f;
-        // }
-        // else if (stateMachine.currentSpeed >= stateMachine.slowRunSpeed)
-        // {
-        //     targetRunSpeed = 2f;
-        // }
-        // else
-        // {
-        //     targetRunSpeed = 1f;
-        // }
+        float targetRunSpeed = CalculateTargetRunSpeed();
         
         float currentRunSpeed = stateMachine.Animator.GetFloat("runspeed");
         stateMachine.Animator.SetFloat("runspeed", Mathf.Lerp(currentRunSpeed, targetRunSpeed, Time.deltaTime * stateMachine.acceleration));
-        
-        // if (stateMachine.currentSpeed > 5f)
-        // {
-        //     stateMachine.Animator.SetFloat("runspeed", 1);
-        // }
-        // else
-        // {
-        //     stateMachine.Animator.SetFloat("runspeed", 0);
-        // }
         
         ApplyGravity();
         MoveCharacter(movement, stateMachine.currentSpeed);
@@ -125,6 +69,23 @@ public class MovementState : PlayerBaseState
         else
         {
             return stateMachine.slowRunSpeed;
+        }
+    }
+    
+    private float CalculateTargetRunSpeed()
+    {
+        if (stateMachine.isRunning && !stateMachine.walkScene)
+        {
+            return 2f;
+        }
+        else if (stateMachine.currentSpeed <= stateMachine.slowRunSpeed &&
+                 stateMachine.currentSpeed >= stateMachine.walkSpeed && !stateMachine.walkScene)
+        {
+            return 1f;
+        }
+        else
+        {
+            return stateMachine.walkScene ? 0f : 1f;
         }
     }
 }

@@ -4,23 +4,20 @@ using UnityEngine.InputSystem;
 public class InputHandler : MonoBehaviour
 {
     private PlayerInputActions playerInputActions;
-    
+    private PlayerStateMachine playerStateMachine;
+
     private void Awake()
     {
         playerInputActions = new PlayerInputActions();
+        playerStateMachine = GetComponent<PlayerStateMachine>();
         playerInputActions.Gameplay.Enable();
     }
 
     private void OnEnable()
     {
-        // Movement
         playerInputActions.Gameplay.Move.performed += OnMove;
         playerInputActions.Gameplay.Move.canceled += OnMove;
-        
-        // Jump
         playerInputActions.Gameplay.Jump.performed += OnJump;
-        
-        // Run
         playerInputActions.Gameplay.Running.performed += OnRun;
         playerInputActions.Gameplay.Running.canceled += OnRun;
     }
@@ -37,16 +34,23 @@ public class InputHandler : MonoBehaviour
     private void OnMove(InputAction.CallbackContext context)
     {
         Vector2 input = context.ReadValue<Vector2>();
-        GetComponent<PlayerStateMachine>().movementInput = new Vector3(input.x, 0, input.y);
+        playerStateMachine.movementInput = new Vector3(input.x, 0, input.y);
     }
 
     private void OnJump(InputAction.CallbackContext context)
     {
-        GetComponent<PlayerStateMachine>().jumpTriggered = true;
+        playerStateMachine.jumpTriggered = true;
     }
 
     private void OnRun(InputAction.CallbackContext context)
     {
-        GetComponent<PlayerStateMachine>().isRunning = context.performed;
+        if (!playerStateMachine.walkScene)
+        {
+            playerStateMachine.isRunning = context.performed;
+        }
+        else
+        {
+            playerStateMachine.isRunning = false;
+        }
     }
 }
