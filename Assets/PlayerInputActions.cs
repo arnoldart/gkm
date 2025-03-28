@@ -218,6 +218,67 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""isPartOfComposite"": false
                 }
             ]
+        },
+        {
+            ""name"": ""WeaponShortcut"",
+            ""id"": ""5489fd84-448f-48e0-9720-e992ab05fae7"",
+            ""actions"": [
+                {
+                    ""name"": ""Equip"",
+                    ""type"": ""Button"",
+                    ""id"": ""13792f02-edd7-4216-a085-d8d66b91d8a0"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                }
+            ],
+            ""bindings"": [
+                {
+                    ""name"": """",
+                    ""id"": ""f602bebb-0228-47e4-83a3-11b2fc1991a3"",
+                    ""path"": ""<Keyboard>/1"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Equip"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""4775f595-edb2-4579-9df7-4acc9c6e3871"",
+                    ""path"": ""<Keyboard>/2"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Equip"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""8aff09d6-7345-4a62-ae3c-bcbc70ebbefd"",
+                    ""path"": ""<Keyboard>/3"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Equip"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""629bc514-a31e-4f85-83d5-00a441a76b2e"",
+                    ""path"": ""<Keyboard>/4"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Equip"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                }
+            ]
         }
     ],
     ""controlSchemes"": [
@@ -240,11 +301,15 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         m_Gameplay_Running = m_Gameplay.FindAction("Running", throwIfNotFound: true);
         m_Gameplay_Jump = m_Gameplay.FindAction("Jump", throwIfNotFound: true);
         m_Gameplay_Look = m_Gameplay.FindAction("Look", throwIfNotFound: true);
+        // WeaponShortcut
+        m_WeaponShortcut = asset.FindActionMap("WeaponShortcut", throwIfNotFound: true);
+        m_WeaponShortcut_Equip = m_WeaponShortcut.FindAction("Equip", throwIfNotFound: true);
     }
 
     ~@PlayerInputActions()
     {
         UnityEngine.Debug.Assert(!m_Gameplay.enabled, "This will cause a leak and performance issues, PlayerInputActions.Gameplay.Disable() has not been called.");
+        UnityEngine.Debug.Assert(!m_WeaponShortcut.enabled, "This will cause a leak and performance issues, PlayerInputActions.WeaponShortcut.Disable() has not been called.");
     }
 
     public void Dispose()
@@ -380,6 +445,52 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         }
     }
     public GameplayActions @Gameplay => new GameplayActions(this);
+
+    // WeaponShortcut
+    private readonly InputActionMap m_WeaponShortcut;
+    private List<IWeaponShortcutActions> m_WeaponShortcutActionsCallbackInterfaces = new List<IWeaponShortcutActions>();
+    private readonly InputAction m_WeaponShortcut_Equip;
+    public struct WeaponShortcutActions
+    {
+        private @PlayerInputActions m_Wrapper;
+        public WeaponShortcutActions(@PlayerInputActions wrapper) { m_Wrapper = wrapper; }
+        public InputAction @Equip => m_Wrapper.m_WeaponShortcut_Equip;
+        public InputActionMap Get() { return m_Wrapper.m_WeaponShortcut; }
+        public void Enable() { Get().Enable(); }
+        public void Disable() { Get().Disable(); }
+        public bool enabled => Get().enabled;
+        public static implicit operator InputActionMap(WeaponShortcutActions set) { return set.Get(); }
+        public void AddCallbacks(IWeaponShortcutActions instance)
+        {
+            if (instance == null || m_Wrapper.m_WeaponShortcutActionsCallbackInterfaces.Contains(instance)) return;
+            m_Wrapper.m_WeaponShortcutActionsCallbackInterfaces.Add(instance);
+            @Equip.started += instance.OnEquip;
+            @Equip.performed += instance.OnEquip;
+            @Equip.canceled += instance.OnEquip;
+        }
+
+        private void UnregisterCallbacks(IWeaponShortcutActions instance)
+        {
+            @Equip.started -= instance.OnEquip;
+            @Equip.performed -= instance.OnEquip;
+            @Equip.canceled -= instance.OnEquip;
+        }
+
+        public void RemoveCallbacks(IWeaponShortcutActions instance)
+        {
+            if (m_Wrapper.m_WeaponShortcutActionsCallbackInterfaces.Remove(instance))
+                UnregisterCallbacks(instance);
+        }
+
+        public void SetCallbacks(IWeaponShortcutActions instance)
+        {
+            foreach (var item in m_Wrapper.m_WeaponShortcutActionsCallbackInterfaces)
+                UnregisterCallbacks(item);
+            m_Wrapper.m_WeaponShortcutActionsCallbackInterfaces.Clear();
+            AddCallbacks(instance);
+        }
+    }
+    public WeaponShortcutActions @WeaponShortcut => new WeaponShortcutActions(this);
     private int m_KeyboardMouseSchemeIndex = -1;
     public InputControlScheme KeyboardMouseScheme
     {
@@ -405,5 +516,9 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         void OnRunning(InputAction.CallbackContext context);
         void OnJump(InputAction.CallbackContext context);
         void OnLook(InputAction.CallbackContext context);
+    }
+    public interface IWeaponShortcutActions
+    {
+        void OnEquip(InputAction.CallbackContext context);
     }
 }
