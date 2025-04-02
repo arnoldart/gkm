@@ -3,7 +3,30 @@ using UnityEngine;
 public class LootItem : MonoBehaviour
 {
     public Item item;
-    public int quantity; // Jumlah item dalam loot ini
+    public int quantity;
+
+    [HideInInspector] public int damage;
+    [HideInInspector] public int durability;
+    
+    [HideInInspector] public int maxStack;
+    [HideInInspector] public int healthRestored;
+
+    private void OnValidate()
+    {
+        if (item != null)
+        {
+            if (item.itemType == ItemType.Weapon)
+            {
+                item.damage = damage;
+                item.durability = durability;
+            }
+            else if (item.itemType == ItemType.Consumable)
+            {
+                item.maxStack = maxStack;
+                item.healthRestored = healthRestored;
+            }
+        }
+    }
 
     private void OnTriggerEnter(Collider other)
     {
@@ -13,7 +36,7 @@ public class LootItem : MonoBehaviour
             if (inventoryManager != null)
             {
                 inventoryManager.AddItem(item, quantity);
-                Destroy(gameObject); // Hancurkan objek loot setelah diambil
+                Destroy(gameObject);
             }
         }
     }
