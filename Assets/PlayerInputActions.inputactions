@@ -196,6 +196,67 @@
                     "isPartOfComposite": false
                 }
             ]
+        },
+        {
+            "name": "WeaponShortcut",
+            "id": "5489fd84-448f-48e0-9720-e992ab05fae7",
+            "actions": [
+                {
+                    "name": "Equip",
+                    "type": "Button",
+                    "id": "13792f02-edd7-4216-a085-d8d66b91d8a0",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "f602bebb-0228-47e4-83a3-11b2fc1991a3",
+                    "path": "<Keyboard>/1",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Equip",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "4775f595-edb2-4579-9df7-4acc9c6e3871",
+                    "path": "<Keyboard>/2",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Equip",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "8aff09d6-7345-4a62-ae3c-bcbc70ebbefd",
+                    "path": "<Keyboard>/3",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Equip",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "629bc514-a31e-4f85-83d5-00a441a76b2e",
+                    "path": "<Keyboard>/4",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Equip",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
         }
     ],
     "controlSchemes": [
