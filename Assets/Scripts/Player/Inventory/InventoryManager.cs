@@ -46,7 +46,7 @@ public class InventoryManager : MonoBehaviour
         // Jika item bertipe Weapon, langsung equip secara otomatis
         if (newItem.itemType == ItemType.Weapon)
         {
-            equipmentManager.EquipWeapon(newItem);
+            equipmentManager.EquipWeaponToRandomSlot(newItem);
         }
     }
 }
