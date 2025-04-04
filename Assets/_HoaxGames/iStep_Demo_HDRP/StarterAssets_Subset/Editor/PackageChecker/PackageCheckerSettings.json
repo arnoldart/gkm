@@ -1,0 +1,7 @@
+{
+    "EditorFolderRoot": "Assets/_HoaxGames/iStep_Demo_HDRP/StarterAssets_Subset/Editor/",
+    "PackagesToAdd": [
+        "com.unity.cinemachine",
+        "com.unity.inputsystem"
+    ]
+}
