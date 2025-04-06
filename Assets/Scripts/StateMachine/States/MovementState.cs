@@ -2,6 +2,10 @@ using UnityEngine;
 
 public class MovementState : PlayerBaseState
 {
+
+    private float groundedGraceTime = .2f;
+    private float lastGroundedTime;
+
     public MovementState(PlayerStateMachine stateMachine) : base(stateMachine)
     {
     }
@@ -54,7 +58,10 @@ public class MovementState : PlayerBaseState
             return;
         }
 
-        if (!stateMachine.controller.isGrounded)
+        bool isEffectivelyGrounded = stateMachine.controller.isGrounded || (Time.time - lastGroundedTime < groundedGraceTime);
+        bool isInFreeFall = stateMachine.verticalVelocity < -10f;
+
+        if (!isEffectivelyGrounded && isInFreeFall)
         {
             stateMachine.ChangeState(new FallingState(stateMachine));
         }
