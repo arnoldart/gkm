@@ -1,23 +1,45 @@
 using UnityEngine;
 
+/// <summary>
+/// Pengontrol state machine dasar yang mengelola transisi state.
+/// </summary>
 public class StateMachine : MonoBehaviour
 {
-    private State _currentState;
+    /// <summary>
+    /// State yang aktif saat ini.
+    /// </summary>
+    protected State CurrentState { get; private set; }
 
+    /// <summary>
+    /// Mengubah state saat ini ke state baru.
+    /// </summary>
+    /// <param name="newState">State baru untuk transisi.</param>
     public void ChangeState(State newState)
     {
-        _currentState?.Exit();
-        _currentState = newState;
-        _currentState.Enter();
+        if (newState == null)
+        {
+            Debug.LogError("Tidak dapat mengubah ke state null.");
+            return;
+        }
+
+        CurrentState?.Exit();
+        CurrentState = newState;
+        CurrentState.Enter();
     }
 
-    private void Update()
+    /// <summary>
+    /// Mengeksekusi logika update untuk state saat ini.
+    /// </summary>
+    protected virtual void Update()
     {
-        _currentState?.UpdateLogic();
+        CurrentState?.UpdateLogic();
     }
 
-    private void FixedUpdate()
+    /// <summary>
+    /// Mengeksekusi logika fixed update untuk state saat ini.
+    /// </summary>
+    protected virtual void FixedUpdate()
     {
-        _currentState?.UpdatePhysics();
+        CurrentState?.UpdatePhysics();
     }
 }

@@ -1,26 +1,40 @@
 using UnityEngine;
 
+/// <summary>
+/// State untuk ketika pemain jatuh (bergerak ke bawah).
+/// </summary>
 public class FallingState : PlayerBaseState
 {
-    public FallingState(PlayerStateMachine stateMachine) : base(stateMachine) { }
+    /// <summary>
+    /// Membuat state Jatuh baru untuk pemain.
+    /// </summary>
+    /// <param name="stateMachine">State machine pemain.</param>
+    public FallingState(PlayerStateMachine stateMachine) : base(stateMachine) {}
 
-    public override void Enter() { }
+    public override void Enter()
+    {
+        // Bisa memicu animasi jatuh di sini
+    }
 
     public override void UpdateLogic()
     {
-        Vector3 movement = GetCameraAdjustedMovement() * stateMachine.airControl;
+        // Hitung gerakan dengan kontrol terbatas di udara
+        Vector3 movement = GetCameraAdjustedMovement() * PlayerStateMachine.AirControl;
         ApplyGravity();
-        MoveCharacter(movement, 1);
+        MoveCharacter(movement, 1f);
+        RotateTowardsMovementDirection(movement);
 
-        if (stateMachine.controller.isGrounded)
+        // Periksa untuk mendarat
+        if (PlayerStateMachine.Controller.isGrounded)
         {
-            if (stateMachine.movementInput != Vector3.zero)
+            // Pilih state berikutnya berdasarkan input
+            if (PlayerStateMachine.MovementInput != Vector3.zero)
             {
-                stateMachine.ChangeState(new MovementState(stateMachine));
+                PlayerStateMachine.ChangeState(new MovementState(PlayerStateMachine));
             }
             else
             {
-                stateMachine.ChangeState(new IdleState(stateMachine));
+                PlayerStateMachine.ChangeState(new IdleState(PlayerStateMachine));
             }
         }
     }

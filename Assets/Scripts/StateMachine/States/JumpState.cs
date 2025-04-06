@@ -1,32 +1,45 @@
 using UnityEngine;
 
+/// <summary>
+/// State untuk ketika pemain melompat (bergerak ke atas).
+/// </summary>
 public class JumpState : PlayerBaseState
 {
-    public JumpState(PlayerStateMachine stateMachine) : base(stateMachine) { }
+    /// <summary>
+    /// Membuat state Lompat baru untuk pemain.
+    /// </summary>
+    /// <param name="stateMachine">State machine pemain.</param>
+    public JumpState(PlayerStateMachine stateMachine) : base(stateMachine) {}
 
     public override void Enter()
     {
-        stateMachine.verticalVelocity = stateMachine.jumpForce;
+        // Tetapkan kecepatan vertikal awal
+        PlayerStateMachine.VerticalVelocity = PlayerStateMachine.JumpForce;
         
-        stateMachine.Animator.SetTrigger("jump");
+        // Picu animasi lompat
+        PlayerStateMachine.PlayerAnimator.SetTrigger("jump");
     }
 
     public override void UpdateLogic()
     {
-        Vector3 movement = GetCameraAdjustedMovement() * stateMachine.airControl;
+        // Hitung gerakan dengan kontrol terbatas di udara
+        Vector3 movement = GetCameraAdjustedMovement() * PlayerStateMachine.AirControl;
         ApplyGravity();
-        MoveCharacter(movement, 1);
+        MoveCharacter(movement, 1f);
+        RotateTowardsMovementDirection(movement);
 
-        if (stateMachine.verticalVelocity <= 0)
+        // Transisi ke jatuh ketika mencapai puncak
+        if (PlayerStateMachine.VerticalVelocity <= 0)
         {
-            stateMachine.ChangeState(new FallingState(stateMachine));
+            PlayerStateMachine.ChangeState(new FallingState(PlayerStateMachine));
             return;
         }
 
-        if (stateMachine.controller.isGrounded)
+        // Transisi ke idle jika entah bagaimana menyentuh tanah
+        if (PlayerStateMachine.Controller.isGrounded)
         {
-            stateMachine.jumpTriggered = false;
-            stateMachine.ChangeState(new IdleState(stateMachine));
+            PlayerStateMachine.ConsumeJumpTrigger();
+            PlayerStateMachine.ChangeState(new IdleState(PlayerStateMachine));
         }
     }
 
