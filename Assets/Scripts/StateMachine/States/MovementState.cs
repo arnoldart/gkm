@@ -1,14 +1,11 @@
 using UnityEngine;
 
-/// <summary>
-/// State untuk ketika pemain bergerak (berjalan atau berlari).
-/// </summary>
 public class MovementState : PlayerBaseState
 {
-    /// <summary>
-    /// Membuat state Gerakan baru untuk pemain.
-    /// </summary>
-    /// <param name="stateMachine">State machine pemain.</param>
+    private float groundCheckBuffer = 0.2f;
+    private float timeSinceGrounded = 0f;
+    private float slopeLimit = 45f;
+
     public MovementState(PlayerStateMachine stateMachine) : base(stateMachine) {}
 
     public override void Enter()
@@ -22,16 +19,14 @@ public class MovementState : PlayerBaseState
     {
         Vector3 movement = GetCameraAdjustedMovement();
         
-        // Hitung target kecepatan berdasarkan state gerakan
-        float targetSpeed = TentukanTargetKecepatan();
+        float targetSpeed = CalculateSpeedTarget();
         PlayerStateMachine.CurrentSpeed = Mathf.Lerp(
             PlayerStateMachine.CurrentSpeed, 
             targetSpeed, 
             Time.deltaTime * PlayerStateMachine.Acceleration
         );
 
-        // Perbarui parameter kecepatan animasi
-        float targetRunSpeed = HitungTargetKecepatanLari();
+        float targetRunSpeed = CalculateRunningSpeedTarget();
         float currentRunSpeed = PlayerStateMachine.PlayerAnimator.GetFloat("runspeed");
         PlayerStateMachine.PlayerAnimator.SetFloat(
             "runspeed", 
@@ -42,63 +37,88 @@ public class MovementState : PlayerBaseState
         MoveCharacter(movement, PlayerStateMachine.CurrentSpeed);
         RotateTowardsMovementDirection(movement);
 
-        // Tangani transisi
+        CheckGrounding();
+
         if (PlayerStateMachine.MovementInput == Vector3.zero)
         {
             PlayerStateMachine.ChangeState(new IdleState(PlayerStateMachine));
             return;
         }
 
-        if (PlayerStateMachine.JumpTriggered && PlayerStateMachine.Controller.isGrounded)
+        if (PlayerStateMachine.JumpTriggered && IsGroundedWithBuffer())
         {
             PlayerStateMachine.ChangeState(new JumpState(PlayerStateMachine));
             PlayerStateMachine.ConsumeJumpTrigger();
             return;
         }
 
-        if (!PlayerStateMachine.Controller.isGrounded)
+        if (!IsGroundedWithBuffer() && PlayerStateMachine.VerticalVelocity < -1f)
         {
             PlayerStateMachine.ChangeState(new FallingState(PlayerStateMachine));
         }
     }
 
-    /// <summary>
-    /// Menentukan kecepatan yang sesuai berdasarkan pengaturan scene dan status berlari.
-    /// </summary>
-    /// <returns>Target kecepatan gerakan.</returns>
-    private float TentukanTargetKecepatan()
+    private float CalculateSpeedTarget()
     {
-        // Jika berlari diaktifkan dan tombol berlari ditekan
         if (PlayerStateMachine.IsRunning)
         {
             return PlayerStateMachine.RunSpeed;
         }
         
-        // Default movement speed
         return PlayerStateMachine.WalkScene ? 
             PlayerStateMachine.WalkSpeed : 
             PlayerStateMachine.SlowRunSpeed;
     }
     
-    /// <summary>
-    /// Menghitung nilai kecepatan animasi untuk blend animasi berlari.
-    /// </summary>
-    /// <returns>Nilai parameter kecepatan animasi.</returns>
-    private float HitungTargetKecepatanLari()
+    
+    private float CalculateRunningSpeedTarget()
     {
         if (PlayerStateMachine.IsRunning && !PlayerStateMachine.WalkScene)
         {
-            return 2f; // Lari cepat
+            return 2f;
         }
         else if (PlayerStateMachine.CurrentSpeed <= PlayerStateMachine.SlowRunSpeed &&
                  PlayerStateMachine.CurrentSpeed >= PlayerStateMachine.WalkSpeed && 
                  !PlayerStateMachine.WalkScene)
         {
-            return 1f; // Lari lambat
+            return 1f;
         }
         else
         {
-            return PlayerStateMachine.WalkScene ? 0f : 1f; // Jalan atau default
+            return PlayerStateMachine.WalkScene ? 0f : 1f;
         }
+    }
+
+    private void CheckGrounding()
+    {
+        if (PlayerStateMachine.Controller.isGrounded)
+        {
+            timeSinceGrounded = 0f;
+        }
+        else
+        {
+            timeSinceGrounded += Time.deltaTime;
+            
+            if (IsOnSlope())
+            {
+                timeSinceGrounded = 0f;
+            }
+        }
+    }
+
+    private bool IsGroundedWithBuffer()
+    {
+        return timeSinceGrounded < groundCheckBuffer;
+    }
+
+    private bool IsOnSlope()
+    {
+        Ray ray = new Ray(PlayerStateMachine.Controller.transform.position, Vector3.down);
+        if (Physics.Raycast(ray, out RaycastHit hit, 1.1f))
+        {
+            float angle = Vector3.Angle(hit.normal, Vector3.up);
+            return angle < slopeLimit;
+        }
+        return false;
     }
 }
