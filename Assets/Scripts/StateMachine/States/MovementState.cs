@@ -2,90 +2,123 @@ using UnityEngine;
 
 public class MovementState : PlayerBaseState
 {
-    public MovementState(PlayerStateMachine stateMachine) : base(stateMachine)
-    {
-    }
+    private float groundCheckBuffer = 0.2f;
+    private float timeSinceGrounded = 0f;
+    private float slopeLimit = 45f;
+
+    public MovementState(PlayerStateMachine stateMachine) : base(stateMachine) {}
 
     public override void Enter()
     {
-        stateMachine.Animator.SetBool("isWalk", true);
-        stateMachine.Animator.SetFloat("runspeed", 0);
-        stateMachine.currentSpeed = 0;
-        
-        base.Enter();
+        PlayerStateMachine.PlayerAnimator.SetBool("isWalk", true);
+        PlayerStateMachine.PlayerAnimator.SetFloat("runspeed", 0);
+        PlayerStateMachine.CurrentSpeed = 0;
     }
 
     public override void UpdateLogic()
     {
         Vector3 movement = GetCameraAdjustedMovement();
-        float targetSpeed = stateMachine.isRunning ? stateMachine.runSpeed : GetTargetSpeed();
-        stateMachine.currentSpeed = Mathf.Lerp(stateMachine.currentSpeed, targetSpeed, Time.deltaTime * stateMachine.acceleration);
-
-        float targetRunSpeed = CalculateTargetRunSpeed();
         
-        float currentRunSpeed = stateMachine.Animator.GetFloat("runspeed");
-        stateMachine.Animator.SetFloat("runspeed", Mathf.Lerp(currentRunSpeed, targetRunSpeed, Time.deltaTime * stateMachine.acceleration));
+        float targetSpeed = CalculateSpeedTarget();
+        PlayerStateMachine.CurrentSpeed = Mathf.Lerp(
+            PlayerStateMachine.CurrentSpeed, 
+            targetSpeed, 
+            Time.deltaTime * PlayerStateMachine.Acceleration
+        );
+
+        float targetRunSpeed = CalculateRunningSpeedTarget();
+        float currentRunSpeed = PlayerStateMachine.PlayerAnimator.GetFloat("runspeed");
+        PlayerStateMachine.PlayerAnimator.SetFloat(
+            "runspeed", 
+            Mathf.Lerp(currentRunSpeed, targetRunSpeed, Time.deltaTime * PlayerStateMachine.Acceleration)
+        );
         
         ApplyGravity();
-        MoveCharacter(movement, stateMachine.currentSpeed);
+        MoveCharacter(movement, PlayerStateMachine.CurrentSpeed);
+        RotateTowardsMovementDirection(movement);
 
-        // Rotasi karakter sesuai arah gerak
-        if (movement != Vector3.zero)
-        {
-            Quaternion targetRotation = Quaternion.LookRotation(movement);
-            stateMachine.transform.rotation = Quaternion.Slerp(
-                stateMachine.transform.rotation,
-                targetRotation,
-                Time.deltaTime * 15f
-            );
-        }
+        CheckGrounding();
 
-        // Check transitions
-        if (stateMachine.movementInput == Vector3.zero)
+        if (PlayerStateMachine.MovementInput == Vector3.zero)
         {
-            stateMachine.ChangeState(new IdleState(stateMachine));
+            PlayerStateMachine.ChangeState(new IdleState(PlayerStateMachine));
             return;
         }
 
-        if (stateMachine.jumpTriggered && stateMachine.controller.isGrounded)
+        if (PlayerStateMachine.JumpTriggered && IsGroundedWithBuffer())
         {
-            stateMachine.ChangeState(new JumpState(stateMachine));
-            stateMachine.jumpTriggered = false;
+            PlayerStateMachine.ChangeState(new JumpState(PlayerStateMachine));
+            PlayerStateMachine.ConsumeJumpTrigger();
             return;
         }
 
-        if (!stateMachine.controller.isGrounded)
+        if (!IsGroundedWithBuffer() && PlayerStateMachine.VerticalVelocity < -1f)
         {
-            stateMachine.ChangeState(new FallingState(stateMachine));
+            PlayerStateMachine.ChangeState(new FallingState(PlayerStateMachine));
         }
     }
 
-    public float GetTargetSpeed()
+    private float CalculateSpeedTarget()
     {
-        if (stateMachine.walkScene)
+        if (PlayerStateMachine.IsRunning)
         {
-            return stateMachine.walkSpeed;
+            return PlayerStateMachine.RunSpeed;
         }
-        else
-        {
-            return stateMachine.slowRunSpeed;
-        }
+        
+        return PlayerStateMachine.WalkScene ? 
+            PlayerStateMachine.WalkSpeed : 
+            PlayerStateMachine.SlowRunSpeed;
     }
     
-    private float CalculateTargetRunSpeed()
+    
+    private float CalculateRunningSpeedTarget()
     {
-        if (stateMachine.isRunning && !stateMachine.walkScene)
+        if (PlayerStateMachine.IsRunning && !PlayerStateMachine.WalkScene)
         {
             return 2f;
         }
-        else if (stateMachine.currentSpeed <= stateMachine.slowRunSpeed &&
-                 stateMachine.currentSpeed >= stateMachine.walkSpeed && !stateMachine.walkScene)
+        else if (PlayerStateMachine.CurrentSpeed <= PlayerStateMachine.SlowRunSpeed &&
+                 PlayerStateMachine.CurrentSpeed >= PlayerStateMachine.WalkSpeed && 
+                 !PlayerStateMachine.WalkScene)
         {
             return 1f;
         }
         else
         {
-            return stateMachine.walkScene ? 0f : 1f;
+            return PlayerStateMachine.WalkScene ? 0f : 1f;
         }
+    }
+
+    private void CheckGrounding()
+    {
+        if (PlayerStateMachine.Controller.isGrounded)
+        {
+            timeSinceGrounded = 0f;
+        }
+        else
+        {
+            timeSinceGrounded += Time.deltaTime;
+            
+            if (IsOnSlope())
+            {
+                timeSinceGrounded = 0f;
+            }
+        }
+    }
+
+    private bool IsGroundedWithBuffer()
+    {
+        return timeSinceGrounded < groundCheckBuffer;
+    }
+
+    private bool IsOnSlope()
+    {
+        Ray ray = new Ray(PlayerStateMachine.Controller.transform.position, Vector3.down);
+        if (Physics.Raycast(ray, out RaycastHit hit, 1.1f))
+        {
+            float angle = Vector3.Angle(hit.normal, Vector3.up);
+            return angle < slopeLimit;
+        }
+        return false;
     }
 }

@@ -1,57 +1,89 @@
 using System;
 using UnityEngine;
 
+/// <summary>
+/// State machine untuk karakter pemain.
+/// </summary>
 [RequireComponent(typeof(CharacterController))]
 [RequireComponent(typeof(InputHandler))]
-
 public class PlayerStateMachine : StateMachine
 {
-    [Header("Movement Settings")]
-    public float currentSpeed;
-    public float acceleration = 5f;
-    public float walkSpeed;
-    public float slowRunSpeed;
-    public float runSpeed;
-    public float jumpForce = 8f;
-    public float gravity = -25f;
-    public float airControl = 3f;
-    public bool walkScene = false;
-    public bool runScene = true;
-    public bool isRunning;
+    [Header("Pengaturan Gerakan")]
+    [SerializeField] private float walkSpeed = 2f;
+    [SerializeField] private float slowRunSpeed = 4f;
+    [SerializeField] private float runSpeed = 7f;
+    [SerializeField] private float jumpForce = 8f;
+    [SerializeField] private float gravity = -25f;
+    [SerializeField] private float airControl = 3f;
+    [SerializeField] private float acceleration = 5f;
+    [SerializeField] private bool walkScene = false;
+    [SerializeField] private bool runScene = true;
 
-    [Header("References")]
-    public CharacterController controller;
-    public InputHandler inputHandler;
-    public Camera playerCamera;
+    [Header("Referensi")]
+    [SerializeField] private Camera playerCamera;
+    
+    // Properties
+    public CharacterController Controller { get; private set; }
+    public InputHandler InputHandler { get; private set; }
+    public Camera PlayerCamera => playerCamera;
+    public Animator PlayerAnimator { get; private set; }
+    
+    // Variabel state
+    public float CurrentSpeed { get; set; }
+    public Vector3 MovementInput { get; set; }
+    public float VerticalVelocity { get; set; }
+    public bool IsRunning { get; set; }
+    public bool JumpTriggered { get; set; }
+    
+    // Nilai konfigurasi yang terekspos
+    public float WalkSpeed => walkSpeed;
+    public float SlowRunSpeed => slowRunSpeed;
+    public float RunSpeed => runSpeed;
+    public float JumpForce => jumpForce;
+    public float Gravity => gravity;
+    public float AirControl => airControl;
+    public float Acceleration => acceleration;
+    public bool WalkScene => walkScene;
+    public bool RunScene => runScene;
 
-    public Vector3 movementInput;
-    public bool jumpTriggered;
-    public float verticalVelocity;
-
-    public Animator Animator;
-
+    protected virtual void Awake()
+    {
+        // Dapatkan komponen yang dijamin ada oleh RequireComponent
+        Controller = GetComponent<CharacterController>();
+        InputHandler = GetComponent<InputHandler>();
+        PlayerAnimator = GetComponent<Animator>();
+    }
     
     private void Start()
     {
-        controller = GetComponent<CharacterController>();
-        inputHandler = GetComponent<InputHandler>();
-        Animator = GetComponent<Animator>();
-        
+        // Gunakan kamera utama jika tidak ada yang disediakan
         if (playerCamera == null)
         {
             playerCamera = Camera.main;
+            if (playerCamera == null)
+            {
+                Debug.LogError("Tidak ada kamera yang ditemukan. Silakan tetapkan referensi kamera.");
+            }
         }
         
+        // Mulai dengan state idle
         ChangeState(new IdleState(this));
     }
 
-    private void OnDestroy()
+    /// <summary>
+    /// Mengatur ulang pemicu lompat setelah dikonsumsi.
+    /// </summary>
+    public void ConsumeJumpTrigger()
     {
-        
+        JumpTriggered = false;
     }
 
-    // private void Update()
-    // {
-    //     jumpTriggered = false;
-    // }
+    /// <summary>
+    /// Memperbarui vektor input gerakan.
+    /// </summary>
+    /// <param name="input">Vektor input gerakan baru.</param>
+    public void SetMovementInput(Vector3 input)
+    {
+        MovementInput = input;
+    }
 }
