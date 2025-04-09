@@ -40,7 +40,7 @@ public class ClimbState : PlayerBaseState
         targetRotation = Quaternion.LookRotation(forwardDirection, Vector3.up);
         
         // Set animasi climbing
-        PlayerStateMachine.PlayerAnimator.SetBool("isClimbing", true);
+        PlayerStateMachine.PlayerAnimator.SetTrigger("isBracedHang");
         
         // Nonaktifkan controller sementara
         PlayerStateMachine.Controller.enabled = false;
@@ -68,7 +68,7 @@ public class ClimbState : PlayerBaseState
     public override void Exit()
     {
         // Reset animasi
-        PlayerStateMachine.PlayerAnimator.SetBool("isClimbing", false);
+        // PlayerStateMachine.PlayerAnimator.SetBool("isClimbing", false);
         
         // Aktifkan kembali controller
         PlayerStateMachine.Controller.enabled = true;
