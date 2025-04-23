@@ -66,4 +66,9 @@ public class InputHandler : MonoBehaviour
     {
         playerStateMachine.IsRunning = !playerStateMachine.WalkScene && context.performed;
     }
+
+    private void OnAim(InputAction.CallbackContext context)
+    {
+        
+    }
 }

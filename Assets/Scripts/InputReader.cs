@@ -8,6 +8,7 @@ public class InputReader : MonoBehaviour, PlayerInputActions.IGameplayActions
     public bool IsRunning { get; private set; }
     public bool JumpTriggered { get; private set; }
     public bool AttackTriggered { get; private set; }
+    public bool AimTriggered { get; private set; }
 
     private PlayerInputActions _controls;
 
@@ -44,6 +45,12 @@ public class InputReader : MonoBehaviour, PlayerInputActions.IGameplayActions
         // Implement look logic if needed
     }
 
+    public void OnAIM(InputAction.CallbackContext context)
+    {
+        if(context.performed)
+            AimTriggered = true;
+    }
+
     public void OnAttack(InputAction.CallbackContext context)
     {
         if (context.performed)
@@ -54,5 +61,6 @@ public class InputReader : MonoBehaviour, PlayerInputActions.IGameplayActions
     {
         JumpTriggered = false;
         AttackTriggered = false;
+        AimTriggered = false;
     }
 }
