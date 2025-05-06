@@ -1,87 +1,118 @@
 using UnityEngine;
 
 /// <summary>
-/// Kelas dasar untuk semua state khusus pemain.
+/// Kelas dasar untuk semua state pemain.
 /// </summary>
 public abstract class PlayerBaseState : State
 {
     /// <summary>
     /// Referensi ke state machine pemain.
     /// </summary>
-    protected PlayerStateMachine PlayerStateMachine { get; }
+    protected PlayerStateMachine PlayerStateMachine { get; private set; }
 
     /// <summary>
-    /// Konstruktor untuk state pemain.
+    /// Konstruktor untuk PlayerBaseState.
     /// </summary>
-    /// <param name="stateMachine">State machine pemain yang memiliki state ini.</param>
+    /// <param name="stateMachine">State machine pemain.</param>
     protected PlayerBaseState(PlayerStateMachine stateMachine) : base(stateMachine)
     {
         PlayerStateMachine = stateMachine;
     }
-
+    
     /// <summary>
-    /// Menghitung arah gerakan yang disesuaikan dengan orientasi kamera.
-    /// </summary>
-    /// <returns>Vektor gerakan yang disesuaikan dengan orientasi kamera.</returns>
-    protected Vector3 GetCameraAdjustedMovement()
-    {
-        // Dapatkan vektor arah kamera
-        Vector3 cameraForward = PlayerStateMachine.PlayerCamera.transform.forward;
-        Vector3 cameraRight = PlayerStateMachine.PlayerCamera.transform.right;
-        
-        // Hilangkan komponen vertikal
-        cameraForward.y = 0;
-        cameraRight.y = 0;
-        cameraForward.Normalize();
-        cameraRight.Normalize();
-
-        // Hitung arah gerakan relatif terhadap kamera
-        Vector3 inputDirection = PlayerStateMachine.MovementInput.normalized;
-        return (cameraRight * inputDirection.x) + (cameraForward * inputDirection.z);
-    }
-
-    /// <summary>
-    /// Menerapkan gravitasi pada kecepatan vertikal pemain.
+    /// Menerapkan gravitasi pada kecepatan vertikal.
     /// </summary>
     protected void ApplyGravity()
     {
         if (PlayerStateMachine.Controller.isGrounded && PlayerStateMachine.VerticalVelocity < 0)
         {
+            // Nilai kecil negatif untuk menjaga karakter tetap menempel ke tanah
             PlayerStateMachine.VerticalVelocity = -2f;
         }
         else
         {
+            // Aplikasikan gravitasi
             PlayerStateMachine.VerticalVelocity += PlayerStateMachine.Gravity * Time.deltaTime;
         }
     }
 
     /// <summary>
-    /// Menggerakkan karakter menggunakan CharacterController.
+    /// Menggerakkan karakter pemain dengan input yang diberikan.
     /// </summary>
-    /// <param name="motion">Arah untuk bergerak.</param>
-    /// <param name="speed">Pengali kecepatan.</param>
-    protected void MoveCharacter(Vector3 motion, float speed)
+    /// <param name="movement">Vektor gerakan yang dinormalisasi.</param>
+    /// <param name="speedMultiplier">Faktor kecepatan.</param>
+    protected void MoveCharacter(Vector3 movement, float speedMultiplier)
     {
-        Vector3 movement = motion * speed;
-        movement.y = PlayerStateMachine.VerticalVelocity;
-        PlayerStateMachine.Controller.Move(movement * Time.deltaTime);
+        if (movement.magnitude > 1f)
+        {
+            movement.Normalize();
+        }
+
+        // Hitung kecepatan berjalan
+        Vector3 moveVelocity = movement * speedMultiplier;
+        
+        // Tambahkan vektor vertikal (gravitasi/lompatan)
+        moveVelocity.y = PlayerStateMachine.VerticalVelocity;
+        
+        // Gerakkan karakter
+        PlayerStateMachine.Controller.Move(moveVelocity * Time.deltaTime);
+    }
+
+    /// <summary>
+    /// Mendapatkan vektor gerakan yang disesuaikan dengan orientasi kamera.
+    /// </summary>
+    /// <returns>Vektor gerakan yang disesuaikan dengan kamera.</returns>
+    protected Vector3 GetCameraAdjustedMovement()
+    {
+        if (PlayerStateMachine.MovementInput == Vector3.zero)
+        {
+            return Vector3.zero;
+        }
+
+        // Dapatkan transformasi kamera
+        Transform cameraTransform = PlayerStateMachine.PlayerCamera.transform;
+        
+        // Buat bidang XZ dari vektor forward dan right kamera
+        Vector3 forward = cameraTransform.forward;
+        Vector3 right = cameraTransform.right;
+        
+        forward.y = 0;
+        right.y = 0;
+        forward.Normalize();
+        right.Normalize();
+        
+        // Hitung vektor gerakan relatif terhadap kamera
+        return (forward * PlayerStateMachine.MovementInput.z + right * PlayerStateMachine.MovementInput.x);
+    }
+
+    /// <summary>
+    /// Memutar karakter menghadap arah gerakan.
+    /// </summary>
+    /// <param name="movement">Vektor gerakan.</param>
+    protected void RotateTowardsMovementDirection(Vector3 movement)
+    {
+        if (movement == Vector3.zero)
+        {
+            return;
+        }
+
+        Quaternion targetRotation = Quaternion.LookRotation(movement);
+        PlayerStateMachine.transform.rotation = Quaternion.Slerp(
+            PlayerStateMachine.transform.rotation,
+            targetRotation,
+            Time.deltaTime * 10f
+        );
     }
     
     /// <summary>
-    /// Memutar karakter untuk menghadap arah gerakan.
+    /// Memainkan animasi dengan crossfade untuk transisi yang mulus
     /// </summary>
-    /// <param name="movement">Arah gerakan.</param>
-    /// <param name="rotationSpeed">Kecepatan rotasi.</param>
-    protected void RotateTowardsMovementDirection(Vector3 movement, float rotationSpeed = 15f)
+    /// <param name="animationName">Nama animasi/state di animator</param>
+    /// <param name="transitionDuration">Durasi transisi dalam detik</param>
+    /// <param name="layer">Layer animator yang digunakan (default = 0)</param>
+    /// <param name="normalizedTime">Waktu normalisasi untuk memulai animasi (default = 0)</param>
+    protected void PlayAnimation(string animationName, float transitionDuration = 0.1f, int layer = 0, float normalizedTime = 0f)
     {
-        if (movement != Vector3.zero)
-        {
-            Quaternion targetRotation = Quaternion.LookRotation(movement);
-            PlayerStateMachine.transform.rotation = Quaternion.Slerp(
-                PlayerStateMachine.transform.rotation,
-                targetRotation,
-                Time.deltaTime * rotationSpeed
-            );
-        }
+        PlayerStateMachine.PlayerAnimator.CrossFadeInFixedTime(animationName, transitionDuration, layer, normalizedTime);
     }
 }

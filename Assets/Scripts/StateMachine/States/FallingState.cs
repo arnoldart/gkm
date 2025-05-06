@@ -13,7 +13,8 @@ public class FallingState : PlayerBaseState
 
     public override void Enter()
     {
-        // Bisa memicu animasi jatuh di sini
+        // Ganti animasi trigger dengan CrossFadeInFixedTime
+        PlayAnimation("Fall", 0.2f);
     }
 
     public override void UpdateLogic()

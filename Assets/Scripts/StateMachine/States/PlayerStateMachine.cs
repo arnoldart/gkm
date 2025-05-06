@@ -34,6 +34,7 @@ public class PlayerStateMachine : StateMachine
     public float VerticalVelocity { get; set; }
     public bool IsRunning { get; set; }
     public bool JumpTriggered { get; set; }
+    public bool IsAiming { get; set; }
     
     // Nilai konfigurasi yang terekspos
     public float WalkSpeed => walkSpeed;

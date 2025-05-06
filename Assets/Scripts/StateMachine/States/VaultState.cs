@@ -40,8 +40,8 @@ public class VaultState : PlayerBaseState
         // Hitung rotasi target
         targetRotation = Quaternion.LookRotation(forwardDirection, Vector3.up);
         
-        // Set animasi vault
-        PlayerStateMachine.PlayerAnimator.SetTrigger("isVaulting");
+        // Ganti SetTrigger dengan CrossFadeInFixedTime
+        PlayAnimation("Vault", 0.1f);
         
         // Nonaktifkan controller
         PlayerStateMachine.Controller.enabled = false;
@@ -55,18 +55,18 @@ public class VaultState : PlayerBaseState
         vaultTimer += Time.deltaTime;
         float normalizedTime = Mathf.Clamp01(vaultTimer / vaultDuration);
         
-        // Gerakan vault dengan kurva parabola
+        // Gerakan vault dengan kurva yang lebih halus
         if (normalizedTime <= 0.5f)
         {
-            // Separuh pertama: bergerak dari start ke puncak
-            float firstHalfTime = normalizedTime * 2f;
-            PlayerStateMachine.transform.position = Vector3.Lerp(startPosition, peakPosition, firstHalfTime);
+            // Pertama 50%: dari awal ke puncak
+            float upProgress = normalizedTime / 0.5f;
+            PlayerStateMachine.transform.position = Vector3.Lerp(startPosition, peakPosition, SmoothStep(upProgress));
         }
         else
         {
-            // Separuh kedua: bergerak dari puncak ke akhir
-            float secondHalfTime = (normalizedTime - 0.5f) * 2f;
-            PlayerStateMachine.transform.position = Vector3.Lerp(peakPosition, endPosition, secondHalfTime);
+            // 50% sisanya: dari puncak ke akhir
+            float downProgress = (normalizedTime - 0.5f) / 0.5f;
+            PlayerStateMachine.transform.position = Vector3.Lerp(peakPosition, endPosition, SmoothStep(downProgress));
         }
         
         // Interpolasi rotasi
@@ -75,6 +75,9 @@ public class VaultState : PlayerBaseState
         // Transition ke Idle state ketika selesai
         if (vaultTimer >= vaultDuration)
         {
+            // Pastikan posisi akhir tepat
+            PlayerStateMachine.transform.position = endPosition;
+            PlayerStateMachine.transform.rotation = targetRotation;
             PlayerStateMachine.ChangeState(new IdleState(PlayerStateMachine));
         }
     }
@@ -86,5 +89,11 @@ public class VaultState : PlayerBaseState
         
         // Reset vertical velocity
         PlayerStateMachine.VerticalVelocity = 0f;
+    }
+    
+    // Fungsi interpolasi SmoothStep untuk gerakan lebih halus
+    private float SmoothStep(float x)
+    {
+        return x * x * (3 - 2 * x);
     }
 }
