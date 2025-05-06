@@ -58,6 +58,11 @@ public class MovementState : PlayerBaseState
         }
     }
 
+    public override void Exit()
+    {
+        PlayerStateMachine.PlayerAnimator.SetBool("isWalk", false);
+    }
+
     private float CalculateSpeedTarget()
     {
         if (PlayerStateMachine.IsRunning)

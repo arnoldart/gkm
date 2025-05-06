@@ -39,8 +39,8 @@ public class ClimbState : PlayerBaseState
         // Hitung rotasi target (menghadap arah normal permukaan)
         targetRotation = Quaternion.LookRotation(forwardDirection, Vector3.up);
         
-        // Set animasi climbing
-        PlayerStateMachine.PlayerAnimator.SetTrigger("isBracedHang");
+        // Ganti SetTrigger dengan CrossFadeInFixedTime
+        PlayAnimation("BracedHang", 0.1f);
         
         // Nonaktifkan controller sementara
         PlayerStateMachine.Controller.enabled = false;
@@ -67,8 +67,7 @@ public class ClimbState : PlayerBaseState
 
     public override void Exit()
     {
-        // Reset animasi
-        // PlayerStateMachine.PlayerAnimator.SetBool("isClimbing", false);
+        // Tidak perlu reset parameter bool karena menggunakan CrossFade
         
         // Aktifkan kembali controller
         PlayerStateMachine.Controller.enabled = true;

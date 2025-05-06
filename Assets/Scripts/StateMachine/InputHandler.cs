@@ -27,6 +27,8 @@ public class InputHandler : MonoBehaviour
         playerInputActions.Gameplay.Jump.performed += OnJump;
         playerInputActions.Gameplay.Running.performed += OnRun;
         playerInputActions.Gameplay.Running.canceled += OnRun;
+        playerInputActions.Gameplay.AIM.performed += OnAim;
+        playerInputActions.Gameplay.AIM.canceled += OnAim;
     }
 
     private void OnDisable()
@@ -37,6 +39,8 @@ public class InputHandler : MonoBehaviour
         playerInputActions.Gameplay.Jump.performed -= OnJump;
         playerInputActions.Gameplay.Running.performed -= OnRun;
         playerInputActions.Gameplay.Running.canceled -= OnRun;
+        playerInputActions.Gameplay.AIM.performed -= OnAim;
+        playerInputActions.Gameplay.AIM.canceled -= OnAim;
         
         // Nonaktifkan tindakan input
         playerInputActions.Gameplay.Disable();
@@ -67,8 +71,12 @@ public class InputHandler : MonoBehaviour
         playerStateMachine.IsRunning = !playerStateMachine.WalkScene && context.performed;
     }
 
+    /// <summary>
+    /// Menangani input membidik.
+    /// </summary>
     private void OnAim(InputAction.CallbackContext context)
     {
-        
+        // Set flag membidik berdasarkan status input (ditekan atau dilepas)
+        playerStateMachine.IsAiming = context.performed;
     }
 }
