@@ -27,6 +27,10 @@ public class InputHandler : MonoBehaviour
         playerInputActions.Gameplay.Jump.performed += OnJump;
         playerInputActions.Gameplay.Running.performed += OnRun;
         playerInputActions.Gameplay.Running.canceled += OnRun;
+        playerInputActions.Gameplay.AIM.performed += OnAim;
+        playerInputActions.Gameplay.AIM.canceled += OnAim;
+        playerInputActions.Gameplay.Heal.performed += OnHeal;
+        playerInputActions.Gameplay.Heal.canceled += OnHeal;
     }
 
     private void OnDisable()
@@ -37,6 +41,10 @@ public class InputHandler : MonoBehaviour
         playerInputActions.Gameplay.Jump.performed -= OnJump;
         playerInputActions.Gameplay.Running.performed -= OnRun;
         playerInputActions.Gameplay.Running.canceled -= OnRun;
+        playerInputActions.Gameplay.AIM.performed -= OnAim;
+        playerInputActions.Gameplay.AIM.canceled -= OnAim;
+        playerInputActions.Gameplay.Heal.performed -= OnHeal;
+        playerInputActions.Gameplay.Heal.canceled -= OnHeal;
         
         // Nonaktifkan tindakan input
         playerInputActions.Gameplay.Disable();
@@ -65,5 +73,23 @@ public class InputHandler : MonoBehaviour
     private void OnRun(InputAction.CallbackContext context)
     {
         playerStateMachine.IsRunning = !playerStateMachine.WalkScene && context.performed;
+    }
+
+    /// <summary>
+    /// Menangani input membidik.
+    /// </summary>
+    private void OnAim(InputAction.CallbackContext context)
+    {
+        // Set flag membidik berdasarkan status input (ditekan atau dilepas)
+        playerStateMachine.IsAiming = context.performed;
+    }
+
+    private void OnHeal(InputAction.CallbackContext context)
+    {
+        playerStateMachine.IsHealing = context.performed;
+        if (context.performed && playerStateMachine.PlayerHealthManager != null)
+        {
+            playerStateMachine.PlayerHealthManager.HealPlayer();
+        }
     }
 }

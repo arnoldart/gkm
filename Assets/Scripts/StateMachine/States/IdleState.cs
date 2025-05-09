@@ -13,7 +13,9 @@ public class IdleState : PlayerBaseState
 
     public override void Enter()
     {
-        PlayerStateMachine.PlayerAnimator.SetBool("isWalk", false);
+        // Gunakan CrossFadeInFixedTime alih-alih SetBool
+        PlayAnimation("Idle", 0.2f);
+        
         PlayerStateMachine.VerticalVelocity = -2f;
     }
 
@@ -23,6 +25,11 @@ public class IdleState : PlayerBaseState
         MoveCharacter(Vector3.zero, 0);
 
         // Tangani transisi
+        if (PlayerStateMachine.IsAiming)
+        {
+            PlayerStateMachine.ChangeState(new AimState(PlayerStateMachine));
+            return;
+        }
         if (PlayerStateMachine.MovementInput != Vector3.zero)
         {
             PlayerStateMachine.ChangeState(new MovementState(PlayerStateMachine));
@@ -44,6 +51,7 @@ public class IdleState : PlayerBaseState
 
     public override void Exit()
     {
-        PlayerStateMachine.PlayerAnimator.SetBool("isWalk", true);
+        // Tidak perlu melakukan reset parameter bool
+        // StateEntry baru akan melakukan transisi dengan CrossFade
     }
 }

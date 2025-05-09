@@ -8,7 +8,7 @@ public class StateMachine : MonoBehaviour
     /// <summary>
     /// State yang aktif saat ini.
     /// </summary>
-    protected State CurrentState { get; private set; }
+    public State CurrentState { get; private set; }
 
     /// <summary>
     /// Mengubah state saat ini ke state baru.

@@ -16,8 +16,8 @@ public class JumpState : PlayerBaseState
         // Tetapkan kecepatan vertikal awal
         PlayerStateMachine.VerticalVelocity = PlayerStateMachine.JumpForce;
         
-        // Picu animasi lompat
-        PlayerStateMachine.PlayerAnimator.SetTrigger("jump");
+        // Ganti SetTrigger dengan CrossFadeInFixedTime
+        PlayAnimation("Jump", 0.1f);
     }
 
     public override void UpdateLogic()
