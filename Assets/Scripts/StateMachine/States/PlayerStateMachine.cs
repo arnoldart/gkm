@@ -21,6 +21,10 @@ public class PlayerStateMachine : StateMachine
 
     [Header("Referensi")]
     [SerializeField] private Camera playerCamera;
+
+    [Header("Referensi Health")]
+    [SerializeField] private PlayerHealthManager playerHealthManager;
+    public PlayerHealthManager PlayerHealthManager => playerHealthManager;
     
     // Properties
     public CharacterController Controller { get; private set; }
@@ -35,6 +39,7 @@ public class PlayerStateMachine : StateMachine
     public bool IsRunning { get; set; }
     public bool JumpTriggered { get; set; }
     public bool IsAiming { get; set; }
+    public bool IsHealing { get; set; }
     
     // Nilai konfigurasi yang terekspos
     public float WalkSpeed => walkSpeed;
@@ -53,6 +58,15 @@ public class PlayerStateMachine : StateMachine
         Controller = GetComponent<CharacterController>();
         InputHandler = GetComponent<InputHandler>();
         PlayerAnimator = GetComponent<Animator>();
+
+        if (playerHealthManager == null)
+        {
+            playerHealthManager = GetComponent<PlayerHealthManager>();
+            if (playerHealthManager == null)
+            {
+                Debug.LogError("PlayerHealthManager tidak ditemukan pada player!");
+            }
+        }
     }
     
     private void Start()
