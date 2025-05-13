@@ -5,6 +5,9 @@ using UnityEngine;
 /// </summary>
 public class JumpState : PlayerBaseState
 {
+    private float momentumDecayRate = 0.95f; // Rate penurunan momentum per frame
+    private float minMomentumThreshold = 0.1f; // Threshold minimum momentum
+
     /// <summary>
     /// Membuat state Lompat baru untuk pemain.
     /// </summary>
@@ -22,26 +25,36 @@ public class JumpState : PlayerBaseState
 
     public override void UpdateLogic()
     {
-        // Hitung gerakan dengan kontrol terbatas di udara
-        Vector3 movement = GetCameraAdjustedMovement() * PlayerStateMachine.AirControl;
-        ApplyGravity();
-        MoveCharacter(movement, 1f);
-        RotateTowardsMovementDirection(movement);
-
-        // Transisi ke jatuh ketika mencapai puncak
-        if (PlayerStateMachine.VerticalVelocity <= 0)
+        // Terapkan momentum horizontal (tanpa Y) dengan decay
+        Vector3 momentumMovement = PlayerStateMachine.JumpMomentum * PlayerStateMachine.JumpMomentumMultiplier;
+        momentumMovement.y = 0f;
+        Vector3 inputMovement = GetCameraAdjustedMovement() * PlayerStateMachine.AirControl;
+        inputMovement.y = 0f;
+        // Gabungkan momentum horizontal dan input player
+        Vector3 finalMovement = momentumMovement + inputMovement;
+        // Update decay momentum
+        PlayerStateMachine.JumpMomentum *= momentumDecayRate;
+        if (PlayerStateMachine.JumpMomentum.magnitude < minMomentumThreshold)
         {
-            PlayerStateMachine.ChangeState(new FallingState(PlayerStateMachine));
-            return;
+            PlayerStateMachine.JumpMomentum = Vector3.zero;
         }
-
-        // Transisi ke idle jika entah bagaimana menyentuh tanah
+        ApplyGravity();
+        // Gunakan finalMovement untuk XZ, VerticalVelocity untuk Y
+        Vector3 move = new Vector3(finalMovement.x, PlayerStateMachine.VerticalVelocity, finalMovement.z);
+        PlayerStateMachine.Controller.Move(move * Time.deltaTime);
+        RotateTowardsMovementDirection(finalMovement);
+        // Transisi ke idle jika menyentuh tanah
         if (PlayerStateMachine.Controller.isGrounded)
         {
+            PlayerStateMachine.JumpMomentum = Vector3.zero;
             PlayerStateMachine.ConsumeJumpTrigger();
             PlayerStateMachine.ChangeState(new IdleState(PlayerStateMachine));
         }
     }
 
-    public override void Exit() { }
+    public override void Exit() 
+    {
+        // Reset momentum saat keluar dari state lompat
+        PlayerStateMachine.JumpMomentum = Vector3.zero;
+    }
 }

@@ -47,6 +47,14 @@ public class MovementState : PlayerBaseState
 
         if (PlayerStateMachine.JumpTriggered && IsGroundedWithBuffer())
         {
+            // Ambil arah gerak horizontal (tanpa Y)
+            Vector3 currentMovement = GetCameraAdjustedMovement();
+            currentMovement.y = 0f;
+            // Hitung kecepatan horizontal aktual (tanpa Y)
+            float horizontalSpeed = PlayerStateMachine.CurrentSpeed;
+            // Momentum hanya pada sumbu XZ, tidak Y
+            PlayerStateMachine.JumpMomentum = currentMovement.normalized * horizontalSpeed;
+            Debug.Log($"Jump momentum: {PlayerStateMachine.JumpMomentum}");
             PlayerStateMachine.ChangeState(new JumpState(PlayerStateMachine));
             PlayerStateMachine.ConsumeJumpTrigger();
             return;

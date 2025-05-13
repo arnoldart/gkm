@@ -12,7 +12,7 @@ public class PlayerStateMachine : StateMachine
     [SerializeField] private float walkSpeed = 2f;
     [SerializeField] private float slowRunSpeed = 4f;
     [SerializeField] private float runSpeed = 7f;
-    [SerializeField] private float jumpForce = 8f;
+    [SerializeField] private float jumpForce = 12f;
     [SerializeField] private float gravity = -25f;
     [SerializeField] private float airControl = 3f;
     [SerializeField] private float acceleration = 5f;
@@ -40,6 +40,11 @@ public class PlayerStateMachine : StateMachine
     public bool JumpTriggered { get; set; }
     public bool IsAiming { get; set; }
     public bool IsHealing { get; set; }
+    private bool isCursorLocked = true;
+    
+    // Momentum saat lompat
+    public Vector3 JumpMomentum { get; set; }
+    public float JumpMomentumMultiplier { get; set; } = 1.2f;
     
     // Nilai konfigurasi yang terekspos
     public float WalkSpeed => walkSpeed;
@@ -81,8 +86,25 @@ public class PlayerStateMachine : StateMachine
             }
         }
         
+        SetCursorLock(true);
         // Mulai dengan state idle
         ChangeState(new IdleState(this));
+    }
+
+    protected override void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            isCursorLocked = !isCursorLocked;
+            SetCursorLock(isCursorLocked);
+        }
+        base.Update();
+    }
+
+    private void SetCursorLock(bool locked)
+    {
+        Cursor.lockState = locked ? CursorLockMode.Locked : CursorLockMode.None;
+        Cursor.visible = !locked;
     }
 
     /// <summary>

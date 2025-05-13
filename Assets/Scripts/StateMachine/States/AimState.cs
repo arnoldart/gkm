@@ -39,7 +39,7 @@ public class AimState : PlayerBaseState
         PlayerStateMachine.IsAiming = true;
         
         // Lock cursor to center of screen when aiming
-        Cursor.lockState = CursorLockMode.Locked;
+        // Cursor.lockState = CursorLockMode.Locked;
 
         // Activate Aim Rig layer
         var rigBuilder = PlayerStateMachine.GetComponent<RigBuilder>();
@@ -96,7 +96,7 @@ public class AimState : PlayerBaseState
     public override void Exit()
     {
         // Reset cursor state when exiting aim mode
-        Cursor.lockState = CursorLockMode.None;
+        // Cursor.lockState = CursorLockMode.None;
 
         // Deactivate Aim Rig layer
         var rigBuilder = PlayerStateMachine.GetComponent<RigBuilder>();
