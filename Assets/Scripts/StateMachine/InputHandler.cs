@@ -9,6 +9,7 @@ public class InputHandler : MonoBehaviour
 {
     private PlayerInputActions playerInputActions;
     private PlayerStateMachine playerStateMachine;
+    public bool AttackPressed { get; private set; }
 
     private void Awake()
     {
@@ -31,6 +32,7 @@ public class InputHandler : MonoBehaviour
         playerInputActions.Gameplay.AIM.canceled += OnAim;
         playerInputActions.Gameplay.Heal.performed += OnHeal;
         playerInputActions.Gameplay.Heal.canceled += OnHeal;
+        playerInputActions.Gameplay.Attack.performed += OnAttack;
     }
 
     private void OnDisable()
@@ -45,6 +47,7 @@ public class InputHandler : MonoBehaviour
         playerInputActions.Gameplay.AIM.canceled -= OnAim;
         playerInputActions.Gameplay.Heal.performed -= OnHeal;
         playerInputActions.Gameplay.Heal.canceled -= OnHeal;
+        playerInputActions.Gameplay.Attack.performed -= OnAttack;
         
         // Nonaktifkan tindakan input
         playerInputActions.Gameplay.Disable();
@@ -91,5 +94,21 @@ public class InputHandler : MonoBehaviour
         {
             playerStateMachine.PlayerHealthManager.HealPlayer();
         }
+    }
+
+    private void OnAttack(InputAction.CallbackContext context)
+    {
+        AttackPressed = context.performed;
+    }
+
+    public bool IsAttackPressed()
+    {
+        return AttackPressed;
+    }
+
+    // Reset AttackPressed setiap frame (bisa dipanggil dari PlayerStateMachine setelah update logic)
+    public void ResetAttackPressed()
+    {
+        AttackPressed = false;
     }
 }

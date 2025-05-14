@@ -60,6 +60,13 @@ public class MovementState : PlayerBaseState
             return;
         }
 
+        // Tambahkan deteksi input serang untuk akses substatemachine meele
+        if (PlayerStateMachine.InputHandler != null && PlayerStateMachine.InputHandler.IsAttackPressed())
+        {
+            PlayerStateMachine.PlayerAnimator.CrossFadeInFixedTime("meele", 0.1f);
+            PlayerStateMachine.InputHandler.ResetAttackPressed();
+        }
+
         if (!IsGroundedWithBuffer() && PlayerStateMachine.VerticalVelocity < -1f)
         {
             PlayerStateMachine.ChangeState(new FallingState(PlayerStateMachine));
