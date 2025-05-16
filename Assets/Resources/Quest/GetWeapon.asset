@@ -9,7 +9,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0fec1e772d69f6b449c2006544ba8e20, type: 3}
-  m_Name: QuestDatabase
+  m_Script: {fileID: 11500000, guid: b9e4e76a14a45ca4092a791915236abf, type: 3}
+  m_Name: GetWeapon
   m_EditorClassIdentifier: 
-  quests: []
+  <id>k__BackingField: GetWeapon
+  displayName: Get A Weapon
+  questPrerequisites: []
+  questStepPrefabs: []
