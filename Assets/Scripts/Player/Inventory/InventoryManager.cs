@@ -36,6 +36,7 @@ public class InventoryManager : MonoBehaviour
         }
         else
         {
+            Debug.Log("Item baru ditambahkan ke inventory.");
             // Jika item belum ada di inventory, tambahkan sebagai item baru
             InventoryItem inventoryItem = new InventoryItem(newItem, quantity);
             items.Add(inventoryItem);
@@ -47,6 +48,35 @@ public class InventoryManager : MonoBehaviour
         if (newItem.itemType == ItemType.Weapon)
         {
             equipmentManager.EquipWeaponToRandomSlot(newItem);
+        }
+
+        // Quest system integration
+        GKM.QuestSystem.QuestManager questManager = GKM.QuestSystem.QuestManager.Instance;
+        if (questManager != null)
+        {
+            // Copy list agar aman dari modifikasi saat iterasi
+            var questInstances = new List<GKM.QuestSystem.QuestInstance>(questManager.activeQuests);
+            foreach (var questInstance in questInstances)
+            {
+                for (int i = 0; i < questInstance.objectives.Count; i++)
+                {
+                    var obj = questInstance.objectives[i];
+                    if (obj.template.objectiveType == GKM.QuestSystem.ObjectiveType.CollectItem && obj.template.targetPrefab != null && !obj.IsCompleted)
+                    {
+                        Debug.Log($"[QuestCheck] Cek quest CollectItem: {obj.template.targetPrefab?.name} vs {newItem.itemName}, sebelum: {obj.currentAmount}, tambah: {quantity}, selesai: {obj.IsCompleted}");
+                        obj.currentAmount = Mathf.Min(obj.currentAmount + quantity, obj.template.requiredAmount);
+                        Debug.Log($"[QuestCheck] Setelah tambah: {obj.currentAmount}/{obj.template.requiredAmount}");
+                        if (!obj.IsCompleted && obj.currentAmount >= obj.template.requiredAmount)
+                        {
+                            // Optionally: show notification objective complete
+                        }
+                        if (questInstance.IsCompleted)
+                        {
+                            questManager.CompleteQuest(questInstance);
+                        }
+                    }
+                }
+            }
         }
     }
 }

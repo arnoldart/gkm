@@ -3,17 +3,22 @@ using UnityEngine.UI;
 using System.Text;
 using System.Collections.Generic;
 using TMPro;
+using System;
 
 namespace GKM.QuestSystem
 {
-    public class QuestLog : MonoBehaviour
+    public class QuestUI : MonoBehaviour
     {
-        public TMP_Text questLogText; // Assign di Inspector (UI Text)
+        public TMP_Text questTitle;
+        public TMP_Text questDescription;
+        public TMP_Text questObjectives;
+
         private int currentQuestIndex = 0;
 
-        void Update()
+
+         void Update()
         {
-            if (questLogText != null && QuestManager.Instance != null)
+            if (questTitle != null && QuestManager.Instance != null)
             {
                 // Otomatis skip ke quest berikutnya jika quest saat ini sudah selesai
                 var activeQuests = QuestManager.Instance.activeQuests;
@@ -27,15 +32,16 @@ namespace GKM.QuestSystem
                     if (activeQuests[currentQuestIndex].IsCompleted && currentQuestIndex < activeQuests.Count - 1)
                         currentQuestIndex++;
                 }
-                questLogText.text = GetQuestLogString();
+                questTitle.text = GetQuestLogString();
             }
         }
 
-        string GetQuestLogString()
+        private string GetQuestLogString()
         {
             var activeQuests = QuestManager.Instance.activeQuests;
+
             if (activeQuests.Count == 0)
-                return "No active quests.";
+                return null;
 
             if (currentQuestIndex >= activeQuests.Count)
                 currentQuestIndex = activeQuests.Count - 1;
@@ -43,17 +49,8 @@ namespace GKM.QuestSystem
                 currentQuestIndex = 0;
 
             var questInstance = activeQuests[currentQuestIndex];
-            var sb = new StringBuilder();
-            sb.AppendLine($"<b>{questInstance.template.title}</b> ({questInstance.template.questType})");
-            sb.AppendLine(questInstance.template.description);
-            for (int i = 0; i < questInstance.objectives.Count; i++)
-            {
-                var obj = questInstance.objectives[i];
-                string status = obj.IsCompleted ? "<color=green>Completed</color>" : $"<color=yellow>{obj.currentAmount}/{obj.template.requiredAmount}</color>";
-                sb.AppendLine($"- {obj.template.objectiveType} {obj.template.targetPrefab?.name ?? "?"} : {status}");
-            }
-            sb.AppendLine($"\nQuest {currentQuestIndex + 1} of {activeQuests.Count}");
-            return sb.ToString();
+
+            return questInstance.ToString();
         }
     }
 }

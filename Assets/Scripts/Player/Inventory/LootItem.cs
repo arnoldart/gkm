@@ -33,10 +33,12 @@ public class LootItem : MonoBehaviour
         if (other.CompareTag("Player"))
         {
             InventoryManager inventoryManager = other.GetComponent<InventoryManager>();
+
             if (inventoryManager != null)
             {
                 inventoryManager.AddItem(item, quantity);
-                Destroy(gameObject);
+                // Trigger quest event
+                gameObject.SetActive(false);
             }
         }
     }
