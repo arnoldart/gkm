@@ -73,15 +73,6 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""initialStateCheck"": true
                 },
                 {
-                    ""name"": ""AIM"",
-                    ""type"": ""Button"",
-                    ""id"": ""f0243905-1f44-4405-bff0-f7cadcdbf1f5"",
-                    ""expectedControlType"": """",
-                    ""processors"": """",
-                    ""interactions"": """",
-                    ""initialStateCheck"": false
-                },
-                {
                     ""name"": ""Heal"",
                     ""type"": ""Button"",
                     ""id"": ""ad775566-c051-47e6-8c6f-b8ec2b48dd34"",
@@ -237,17 +228,6 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                 },
                 {
                     ""name"": """",
-                    ""id"": ""57aeb6b0-488c-4b26-be1a-611d6b4cff3a"",
-                    ""path"": ""<Mouse>/rightButton"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""AIM"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
                     ""id"": ""136252fd-c4a0-45cc-b77f-f54b43b88543"",
                     ""path"": ""<Keyboard>/v"",
                     ""interactions"": """",
@@ -267,6 +247,24 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""name"": ""Equip"",
                     ""type"": ""Button"",
                     ""id"": ""13792f02-edd7-4216-a085-d8d66b91d8a0"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""AIM"",
+                    ""type"": ""Button"",
+                    ""id"": ""89f9ef38-0f56-499f-9ddd-b8b0176edd19"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Fire"",
+                    ""type"": ""Button"",
+                    ""id"": ""c544c8aa-8e0a-4f42-9a0e-6b50729e9e1d"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -317,6 +315,28 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""action"": ""Equip"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""e65e8e63-d755-4e3b-b4df-a3781e064f56"",
+                    ""path"": ""<Mouse>/rightButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Keyboard & Mouse"",
+                    ""action"": ""AIM"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""15355a5d-b488-4999-89a3-e4d54d95b161"",
+                    ""path"": ""<Mouse>/leftButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Keyboard & Mouse"",
+                    ""action"": ""Fire"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -341,11 +361,12 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         m_Gameplay_Running = m_Gameplay.FindAction("Running", throwIfNotFound: true);
         m_Gameplay_Jump = m_Gameplay.FindAction("Jump", throwIfNotFound: true);
         m_Gameplay_Look = m_Gameplay.FindAction("Look", throwIfNotFound: true);
-        m_Gameplay_AIM = m_Gameplay.FindAction("AIM", throwIfNotFound: true);
         m_Gameplay_Heal = m_Gameplay.FindAction("Heal", throwIfNotFound: true);
         // WeaponShortcut
         m_WeaponShortcut = asset.FindActionMap("WeaponShortcut", throwIfNotFound: true);
         m_WeaponShortcut_Equip = m_WeaponShortcut.FindAction("Equip", throwIfNotFound: true);
+        m_WeaponShortcut_AIM = m_WeaponShortcut.FindAction("AIM", throwIfNotFound: true);
+        m_WeaponShortcut_Fire = m_WeaponShortcut.FindAction("Fire", throwIfNotFound: true);
     }
 
     ~@PlayerInputActions()
@@ -418,7 +439,6 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
     private readonly InputAction m_Gameplay_Running;
     private readonly InputAction m_Gameplay_Jump;
     private readonly InputAction m_Gameplay_Look;
-    private readonly InputAction m_Gameplay_AIM;
     private readonly InputAction m_Gameplay_Heal;
     public struct GameplayActions
     {
@@ -429,7 +449,6 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         public InputAction @Running => m_Wrapper.m_Gameplay_Running;
         public InputAction @Jump => m_Wrapper.m_Gameplay_Jump;
         public InputAction @Look => m_Wrapper.m_Gameplay_Look;
-        public InputAction @AIM => m_Wrapper.m_Gameplay_AIM;
         public InputAction @Heal => m_Wrapper.m_Gameplay_Heal;
         public InputActionMap Get() { return m_Wrapper.m_Gameplay; }
         public void Enable() { Get().Enable(); }
@@ -455,9 +474,6 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
             @Look.started += instance.OnLook;
             @Look.performed += instance.OnLook;
             @Look.canceled += instance.OnLook;
-            @AIM.started += instance.OnAIM;
-            @AIM.performed += instance.OnAIM;
-            @AIM.canceled += instance.OnAIM;
             @Heal.started += instance.OnHeal;
             @Heal.performed += instance.OnHeal;
             @Heal.canceled += instance.OnHeal;
@@ -480,9 +496,6 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
             @Look.started -= instance.OnLook;
             @Look.performed -= instance.OnLook;
             @Look.canceled -= instance.OnLook;
-            @AIM.started -= instance.OnAIM;
-            @AIM.performed -= instance.OnAIM;
-            @AIM.canceled -= instance.OnAIM;
             @Heal.started -= instance.OnHeal;
             @Heal.performed -= instance.OnHeal;
             @Heal.canceled -= instance.OnHeal;
@@ -508,11 +521,15 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
     private readonly InputActionMap m_WeaponShortcut;
     private List<IWeaponShortcutActions> m_WeaponShortcutActionsCallbackInterfaces = new List<IWeaponShortcutActions>();
     private readonly InputAction m_WeaponShortcut_Equip;
+    private readonly InputAction m_WeaponShortcut_AIM;
+    private readonly InputAction m_WeaponShortcut_Fire;
     public struct WeaponShortcutActions
     {
         private @PlayerInputActions m_Wrapper;
         public WeaponShortcutActions(@PlayerInputActions wrapper) { m_Wrapper = wrapper; }
         public InputAction @Equip => m_Wrapper.m_WeaponShortcut_Equip;
+        public InputAction @AIM => m_Wrapper.m_WeaponShortcut_AIM;
+        public InputAction @Fire => m_Wrapper.m_WeaponShortcut_Fire;
         public InputActionMap Get() { return m_Wrapper.m_WeaponShortcut; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -525,6 +542,12 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
             @Equip.started += instance.OnEquip;
             @Equip.performed += instance.OnEquip;
             @Equip.canceled += instance.OnEquip;
+            @AIM.started += instance.OnAIM;
+            @AIM.performed += instance.OnAIM;
+            @AIM.canceled += instance.OnAIM;
+            @Fire.started += instance.OnFire;
+            @Fire.performed += instance.OnFire;
+            @Fire.canceled += instance.OnFire;
         }
 
         private void UnregisterCallbacks(IWeaponShortcutActions instance)
@@ -532,6 +555,12 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
             @Equip.started -= instance.OnEquip;
             @Equip.performed -= instance.OnEquip;
             @Equip.canceled -= instance.OnEquip;
+            @AIM.started -= instance.OnAIM;
+            @AIM.performed -= instance.OnAIM;
+            @AIM.canceled -= instance.OnAIM;
+            @Fire.started -= instance.OnFire;
+            @Fire.performed -= instance.OnFire;
+            @Fire.canceled -= instance.OnFire;
         }
 
         public void RemoveCallbacks(IWeaponShortcutActions instance)
@@ -574,11 +603,12 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         void OnRunning(InputAction.CallbackContext context);
         void OnJump(InputAction.CallbackContext context);
         void OnLook(InputAction.CallbackContext context);
-        void OnAIM(InputAction.CallbackContext context);
         void OnHeal(InputAction.CallbackContext context);
     }
     public interface IWeaponShortcutActions
     {
         void OnEquip(InputAction.CallbackContext context);
+        void OnAIM(InputAction.CallbackContext context);
+        void OnFire(InputAction.CallbackContext context);
     }
 }

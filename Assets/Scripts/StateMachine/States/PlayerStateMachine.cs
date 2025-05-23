@@ -26,6 +26,12 @@ public class PlayerStateMachine : StateMachine
     [SerializeField] private PlayerHealthManager playerHealthManager;
     public PlayerHealthManager PlayerHealthManager => playerHealthManager;
     
+    [Header("Weapon Settings")]
+    [SerializeField] private int weaponDamage = 20;
+    [SerializeField] private float fireRate = 0.5f;
+    [SerializeField] private float raycastMaxDistance = 100f;
+    [SerializeField] private LayerMask raycastLayerMask = -1; // Default to all layers
+    
     // Properties
     public CharacterController Controller { get; private set; }
     public InputHandler InputHandler { get; private set; }
@@ -41,6 +47,10 @@ public class PlayerStateMachine : StateMachine
     public bool IsAiming { get; set; }
     public bool IsHealing { get; set; }
     private bool isCursorLocked = true;
+    
+    // Weapon State
+    private float lastFireTime = 0f;
+    public bool CanFire => Time.time >= lastFireTime + fireRate;
     
     // Momentum saat lompat
     public Vector3 JumpMomentum { get; set; }
@@ -71,6 +81,12 @@ public class PlayerStateMachine : StateMachine
             {
                 Debug.LogError("PlayerHealthManager tidak ditemukan pada player!");
             }
+        }
+        
+        // Initialize raycast layer mask if not set
+        if (raycastLayerMask == -1)
+        {
+            raycastLayerMask = Physics.DefaultRaycastLayers;
         }
     }
     
@@ -122,5 +138,90 @@ public class PlayerStateMachine : StateMachine
     public void SetMovementInput(Vector3 input)
     {
         MovementInput = input;
+    }
+    
+    /// <summary>
+    /// Menembakkan raycast dari tengah kamera/layar.
+    /// </summary>
+    /// <returns>True jika berhasil menembak, false jika belum bisa menembak (cooldown)</returns>
+    public bool FireWeapon()
+    {
+        if (!CanFire) return false;
+        
+        ShootRaycastFromCamera();
+        lastFireTime = Time.time;
+        return true;
+    }
+    
+    /// <summary>
+    /// Menembakkan raycast dari tengah kamera/layar.
+    /// </summary>
+    private void ShootRaycastFromCamera()
+    {
+        if (playerCamera == null) return;
+        
+        // Mendapatkan posisi tengah layar (0.5, 0.5) dalam normalized viewport coordinates
+        Ray ray = playerCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0f));
+        
+        // Visualisasi raycast dengan debug line
+        Debug.DrawRay(ray.origin, ray.direction * raycastMaxDistance, Color.red, 0.5f);
+        
+        // Efek suara tembakan bisa ditambahkan di sini
+        // AudioManager.PlaySound("GunShot");
+        
+        // Animasi tembakan bisa ditambahkan di sini
+        // PlayerAnimator.SetTrigger("Fire");
+        
+        // Melakukan raycast dan mencatat hit result
+        RaycastHit hitInfo;
+        bool hitSomething = Physics.Raycast(ray, out hitInfo, raycastMaxDistance, raycastLayerMask);
+        
+        if (hitSomething)
+        {
+            // Debug informasi hit
+            Debug.Log($"Raycast hit: {hitInfo.collider.gameObject.name} at distance {hitInfo.distance}");
+            
+            // Opsional: Visualisasi titik hit
+            Debug.DrawLine(ray.origin, hitInfo.point, Color.green, 0.5f);
+            
+            // Periksa apakah objek yang terkena memiliki HealthSystem
+            HealthSystem targetHealth = hitInfo.collider.GetComponent<HealthSystem>();
+            if (targetHealth != null)
+            {
+                // Memberikan damage langsung ke HealthSystem
+                int damageDealt = targetHealth.TakeDamage(weaponDamage, this.gameObject);
+                Debug.Log($"Hit dealt {damageDealt} damage to {hitInfo.collider.gameObject.name}");
+                
+                // Efek hit bisa ditambahkan di sini (darah, partikel, dll)
+                // SpawnHitEffect(hitInfo.point, hitInfo.normal);
+            }
+            else
+            {
+                // Coba cari HealthSystem di parent atau children
+                targetHealth = hitInfo.collider.GetComponentInParent<HealthSystem>();
+                if (targetHealth != null)
+                {
+                    int damageDealt = targetHealth.TakeDamage(weaponDamage, this.gameObject);
+                    Debug.Log($"Hit dealt {damageDealt} damage to parent of {hitInfo.collider.gameObject.name}");
+                }
+                else
+                {
+                    // Jika tidak ada HealthSystem, bisa dicoba gunakan Damager kalau ada (misal untuk hit box khusus)
+                    Damager damager = hitInfo.collider.GetComponent<Damager>();
+                    if (damager != null)
+                    {
+                        Debug.Log($"Hit a Damager on {hitInfo.collider.gameObject.name}");
+                        // Kamu bisa mengimplementasikan logika khusus jika menembak Damager
+                    }
+                    else
+                    {
+                        Debug.Log($"Hit object has no health system: {hitInfo.collider.gameObject.name}");
+                    }
+                }
+            }
+            
+            // Efek impact di surface (decal, partikel berdasarkan material)
+            // InstantiateImpactEffect(hitInfo);
+        }
     }
 }
