@@ -44,7 +44,7 @@ public class ParkourController : MonoBehaviour
             string debugMessage = $"Obstacle: {currentObstacle.hitInfo.transform.name}, " +
                                   $"Height: {currentObstacle.obstacleHeight:F2}m, " +
                                   $"Type: {currentObstacle.obstacleType}";
-            Debug.Log(debugMessage);
+            // Debug.Log(debugMessage);
         }
     }
     
@@ -65,7 +65,7 @@ public class ParkourController : MonoBehaviour
                 break;
                 
             case ParkourType.TooHigh:
-                Debug.Log("Obstacle terlalu tinggi untuk diparkour");
+                // Debug.Log("Obstacle terlalu tinggi untuk diparkour");
                 break;
                 
             case ParkourType.None:

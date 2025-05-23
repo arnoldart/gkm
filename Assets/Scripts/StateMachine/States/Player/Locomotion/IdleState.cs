@@ -35,17 +35,25 @@ public class IdleState : PlayerBaseState
             PlayerStateMachine.ChangeState(new MovementState(PlayerStateMachine));
             return;
         }
-
         if (PlayerStateMachine.JumpTriggered && PlayerStateMachine.Controller.isGrounded)
         {
             PlayerStateMachine.ChangeState(new JumpState(PlayerStateMachine));
             PlayerStateMachine.ConsumeJumpTrigger();
             return;
         }
-
         if (!PlayerStateMachine.Controller.isGrounded)
         {
             PlayerStateMachine.ChangeState(new FallingState(PlayerStateMachine));
+            return;
+        }
+        // Tambahkan deteksi input serang untuk akses substatemachine meele
+        if (PlayerStateMachine.InputHandler != null && PlayerStateMachine.InputHandler.IsAttackPressed())
+        {
+            Debug.Log("Attack pressed in IdleState");
+            PlayerStateMachine.ChangeState(new MeeleState(PlayerStateMachine));
+            // Trigger substatemachine meele dengan CrossFadeInFixedTime
+            // PlayerStateMachine.PlayerAnimator.CrossFadeInFixedTime("Meele", 0.1f);
+            // PlayerStateMachine.InputHandler.ResetAttackPressed();
         }
     }
 

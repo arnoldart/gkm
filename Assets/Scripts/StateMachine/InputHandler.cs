@@ -6,31 +6,34 @@ using UnityEngine.InputSystem;
 /// </summary>
 [RequireComponent(typeof(PlayerStateMachine))]
 public class InputHandler : MonoBehaviour
-{
-    private PlayerInputActions playerInputActions;
+{    private PlayerInputActions playerInputActions;
     private PlayerStateMachine playerStateMachine;
+    public bool AttackPressed { get; private set; }
+    public bool FirePressed { get; private set; }
 
     private void Awake()
     {
         playerInputActions = new PlayerInputActions();
         playerStateMachine = GetComponent<PlayerStateMachine>();
-    }
-
-    private void OnEnable()
+    }    private void OnEnable()
     {
         // Aktifkan tindakan input
         playerInputActions.Gameplay.Enable();
+        playerInputActions.WeaponShortcut.Enable();
         
         // Daftarkan callback event
         playerInputActions.Gameplay.Move.performed += OnMove;
         playerInputActions.Gameplay.Move.canceled += OnMove;
         playerInputActions.Gameplay.Jump.performed += OnJump;
         playerInputActions.Gameplay.Running.performed += OnRun;
-        playerInputActions.Gameplay.Running.canceled += OnRun;
-        playerInputActions.Gameplay.AIM.performed += OnAim;
-        playerInputActions.Gameplay.AIM.canceled += OnAim;
+        playerInputActions.Gameplay.Running.canceled += OnRun;       
+         playerInputActions.WeaponShortcut.AIM.performed += OnAim;
+        playerInputActions.WeaponShortcut.AIM.canceled += OnAim;
         playerInputActions.Gameplay.Heal.performed += OnHeal;
         playerInputActions.Gameplay.Heal.canceled += OnHeal;
+        playerInputActions.Gameplay.Attack.performed += OnAttack;
+        playerInputActions.WeaponShortcut.Fire.performed += OnFire;
+        playerInputActions.WeaponShortcut.Fire.canceled += OnFire;
     }
 
     private void OnDisable()
@@ -41,13 +44,17 @@ public class InputHandler : MonoBehaviour
         playerInputActions.Gameplay.Jump.performed -= OnJump;
         playerInputActions.Gameplay.Running.performed -= OnRun;
         playerInputActions.Gameplay.Running.canceled -= OnRun;
-        playerInputActions.Gameplay.AIM.performed -= OnAim;
-        playerInputActions.Gameplay.AIM.canceled -= OnAim;
+        playerInputActions.WeaponShortcut.AIM.performed -= OnAim;
+        playerInputActions.WeaponShortcut.AIM.canceled -= OnAim;
         playerInputActions.Gameplay.Heal.performed -= OnHeal;
         playerInputActions.Gameplay.Heal.canceled -= OnHeal;
+        playerInputActions.Gameplay.Attack.performed -= OnAttack;
+        playerInputActions.WeaponShortcut.Fire.performed -= OnFire;
+        playerInputActions.WeaponShortcut.Fire.canceled -= OnFire;
         
         // Nonaktifkan tindakan input
         playerInputActions.Gameplay.Disable();
+        playerInputActions.WeaponShortcut.Disable();
     }
 
     /// <summary>
@@ -80,8 +87,20 @@ public class InputHandler : MonoBehaviour
     /// </summary>
     private void OnAim(InputAction.CallbackContext context)
     {
+        Debug.Log("Aim button pressed");
         // Set flag membidik berdasarkan status input (ditekan atau dilepas)
         playerStateMachine.IsAiming = context.performed;
+    }
+
+    private void OnFire(InputAction.CallbackContext context)
+    {
+        FirePressed = context.performed;
+
+        // Debug output when fire is pressed
+        if (context.performed)
+        {
+            Debug.Log("Fire button pressed");
+        }
     }
 
     private void OnHeal(InputAction.CallbackContext context)
@@ -91,5 +110,30 @@ public class InputHandler : MonoBehaviour
         {
             playerStateMachine.PlayerHealthManager.HealPlayer();
         }
+    }
+
+    private void OnAttack(InputAction.CallbackContext context)
+    {
+        AttackPressed = context.performed;
+    }    public bool IsAttackPressed()
+    {
+        return AttackPressed;
+    }
+    
+    public bool IsFirePressed()
+    {
+        return FirePressed;
+    }
+
+    // Reset AttackPressed setiap frame (bisa dipanggil dari PlayerStateMachine setelah update logic)
+    public void ResetAttackPressed()
+    {
+        AttackPressed = false;
+    }
+    
+    // Reset FirePressed setiap frame
+    public void ResetFirePressed()
+    {
+        FirePressed = false;
     }
 }

@@ -51,15 +51,6 @@
                     "initialStateCheck": true
                 },
                 {
-                    "name": "AIM",
-                    "type": "Button",
-                    "id": "f0243905-1f44-4405-bff0-f7cadcdbf1f5",
-                    "expectedControlType": "",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": false
-                },
-                {
                     "name": "Heal",
                     "type": "Button",
                     "id": "ad775566-c051-47e6-8c6f-b8ec2b48dd34",
@@ -215,17 +206,6 @@
                 },
                 {
                     "name": "",
-                    "id": "57aeb6b0-488c-4b26-be1a-611d6b4cff3a",
-                    "path": "<Mouse>/rightButton",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "AIM",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
                     "id": "136252fd-c4a0-45cc-b77f-f54b43b88543",
                     "path": "<Keyboard>/v",
                     "interactions": "",
@@ -245,6 +225,24 @@
                     "name": "Equip",
                     "type": "Button",
                     "id": "13792f02-edd7-4216-a085-d8d66b91d8a0",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "AIM",
+                    "type": "Button",
+                    "id": "89f9ef38-0f56-499f-9ddd-b8b0176edd19",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Fire",
+                    "type": "Button",
+                    "id": "c544c8aa-8e0a-4f42-9a0e-6b50729e9e1d",
                     "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
@@ -293,6 +291,28 @@
                     "processors": "",
                     "groups": "",
                     "action": "Equip",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "e65e8e63-d755-4e3b-b4df-a3781e064f56",
+                    "path": "<Mouse>/rightButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Keyboard & Mouse",
+                    "action": "AIM",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "15355a5d-b488-4999-89a3-e4d54d95b161",
+                    "path": "<Mouse>/leftButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Keyboard & Mouse",
+                    "action": "Fire",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

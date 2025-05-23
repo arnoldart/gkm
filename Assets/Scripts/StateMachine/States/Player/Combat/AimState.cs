@@ -9,11 +9,8 @@ public class AimState : PlayerBaseState
     private bool isAiming = true;
     
     // Parameters for mouse control
-    private float mouseSensitivity = 2.0f;
     private float verticalRotation = 0f;
     private float horizontalRotation = 0f;
-    private float verticalLookMin = -30f;
-    private float verticalLookMax = 60f;
     
     /// <summary>
     /// Membuat state Aim baru untuk pemain.
@@ -39,7 +36,7 @@ public class AimState : PlayerBaseState
         PlayerStateMachine.IsAiming = true;
         
         // Lock cursor to center of screen when aiming
-        Cursor.lockState = CursorLockMode.Locked;
+        // Cursor.lockState = CursorLockMode.Locked;
 
         // Activate Aim Rig layer
         var rigBuilder = PlayerStateMachine.GetComponent<RigBuilder>();
@@ -54,15 +51,10 @@ public class AimState : PlayerBaseState
                 }
             }
         }
-    }
-
-    public override void UpdateLogic()
+    }    public override void UpdateLogic()
     {
         // Terapkan gravitasi
         ApplyGravity();
-        
-        // Update mouse look
-        // HandleMouseLook();
         
         // Gerakan terbatas saat membidik
         Vector3 movement = GetCameraAdjustedMovement() * 0.5f; // Gerakan lebih lambat saat membidik
@@ -71,10 +63,23 @@ public class AimState : PlayerBaseState
         // Karakter selalu menghadap ke arah kamera saat membidik
         AlignWithCamera();
         
+        // Periksa apakah pemain menekan tombol Fire
+        if (PlayerStateMachine.InputHandler != null && PlayerStateMachine.InputHandler.IsFirePressed())
+        {
+            // Gunakan method FireWeapon dari PlayerStateMachine
+            bool fired = PlayerStateMachine.FireWeapon();
+            
+            if (fired)
+            {
+                // Reset status FirePressed setelah berhasil menembak
+                PlayerStateMachine.InputHandler.ResetFirePressed();
+            }
+        }
+        
         // Periksa apakah pemain masih ingin membidik
         if (!PlayerStateMachine.IsAiming)
         {
-            // Transisi ke state PistolAimToIdleState
+            // Transisi ke state IdleState
             PlayerStateMachine.ChangeState(new IdleState(PlayerStateMachine));
             return;
         }
@@ -96,7 +101,7 @@ public class AimState : PlayerBaseState
     public override void Exit()
     {
         // Reset cursor state when exiting aim mode
-        Cursor.lockState = CursorLockMode.None;
+        // Cursor.lockState = CursorLockMode.None;
 
         // Deactivate Aim Rig layer
         var rigBuilder = PlayerStateMachine.GetComponent<RigBuilder>();
@@ -112,8 +117,7 @@ public class AimState : PlayerBaseState
             }
         }
     }
-    
-    /// <summary>
+      /// <summary>
     /// Menyelaraskan rotasi karakter dengan arah kamera.
     /// </summary>
     private void AlignWithCamera()
@@ -134,25 +138,4 @@ public class AimState : PlayerBaseState
             );
         }
     }
-    
-    /// <summary>
-    /// Menangani kontrol kamera dengan mouse saat membidik.
-    /// </summary>
-    // private void HandleMouseLook()
-    // {
-    //     if (PlayerStateMachine.PlayerCamera == null) return;
-        
-    //     // Get mouse input
-    //     float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity;
-    //     float mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity;
-        
-    //     // Calculate rotation
-    //     horizontalRotation += mouseX;
-    //     verticalRotation -= mouseY; // Invert Y axis for intuitive control
-    //     verticalRotation = Mathf.Clamp(verticalRotation, verticalLookMin, verticalLookMax);
-        
-    //     // Hapus pengaturan rotasi player di sini, biarkan AlignWithCamera() yang mengatur
-    //     // Apply vertical rotation to the camera only
-    //     PlayerStateMachine.PlayerCamera.transform.localRotation = Quaternion.Euler(verticalRotation, 0, 0);
-    // }
 }

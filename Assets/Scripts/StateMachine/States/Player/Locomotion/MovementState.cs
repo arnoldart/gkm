@@ -47,9 +47,24 @@ public class MovementState : PlayerBaseState
 
         if (PlayerStateMachine.JumpTriggered && IsGroundedWithBuffer())
         {
+            // Ambil arah gerak horizontal (tanpa Y)
+            Vector3 currentMovement = GetCameraAdjustedMovement();
+            currentMovement.y = 0f;
+            // Hitung kecepatan horizontal aktual (tanpa Y)
+            float horizontalSpeed = PlayerStateMachine.CurrentSpeed;
+            // Momentum hanya pada sumbu XZ, tidak Y
+            PlayerStateMachine.JumpMomentum = currentMovement.normalized * horizontalSpeed;
+            Debug.Log($"Jump momentum: {PlayerStateMachine.JumpMomentum}");
             PlayerStateMachine.ChangeState(new JumpState(PlayerStateMachine));
             PlayerStateMachine.ConsumeJumpTrigger();
             return;
+        }
+
+        // Tambahkan deteksi input serang untuk akses substatemachine meele
+        if (PlayerStateMachine.InputHandler != null && PlayerStateMachine.InputHandler.IsAttackPressed())
+        {
+            PlayerStateMachine.PlayerAnimator.CrossFadeInFixedTime("meele", 0.1f);
+            PlayerStateMachine.InputHandler.ResetAttackPressed();
         }
 
         if (!IsGroundedWithBuffer() && PlayerStateMachine.VerticalVelocity < -1f)
