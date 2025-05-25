@@ -18,12 +18,17 @@ public abstract class PlayerBaseState : State
     {
         PlayerStateMachine = stateMachine;
     }
-    
-    /// <summary>
+      /// <summary>
     /// Menerapkan gravitasi pada kecepatan vertikal.
     /// </summary>
     protected void ApplyGravity()
     {
+        // Jika gravitasi dimatikan, jangan terapkan gravitasi
+        if (!PlayerStateMachine.IsGravityEnabled)
+        {
+            return;
+        }
+        
         if (PlayerStateMachine.Controller.isGrounded && PlayerStateMachine.VerticalVelocity < 0)
         {
             // Nilai kecil negatif untuk menjaga karakter tetap menempel ke tanah
@@ -31,8 +36,8 @@ public abstract class PlayerBaseState : State
         }
         else
         {
-            // Aplikasikan gravitasi
-            PlayerStateMachine.VerticalVelocity += PlayerStateMachine.Gravity * Time.deltaTime;
+            // Aplikasikan gravitasi menggunakan method GetCurrentGravity()
+            PlayerStateMachine.VerticalVelocity += PlayerStateMachine.GetCurrentGravity() * Time.deltaTime;
         }
     }
 

@@ -47,6 +47,13 @@ public class PlayerStateMachine : StateMachine
     public bool IsAiming { get; set; }
     public bool IsHealing { get; set; }
     private bool isCursorLocked = true;
+      // Gravity Control
+    public bool IsGravityEnabled { get; private set; } = true;
+    private float originalGravity;
+    
+    // Climbing reference
+    private PlayerClimbFixed playerClimb;
+    public bool IsClimbing => playerClimb != null && playerClimb.IsClimbing();
     
     // Weapon State
     private float lastFireTime = 0f;
@@ -65,14 +72,13 @@ public class PlayerStateMachine : StateMachine
     public float AirControl => airControl;
     public float Acceleration => acceleration;
     public bool WalkScene => walkScene;
-    public bool RunScene => runScene;
-
-    protected virtual void Awake()
+    public bool RunScene => runScene;    protected virtual void Awake()
     {
         // Dapatkan komponen yang dijamin ada oleh RequireComponent
         Controller = GetComponent<CharacterController>();
         InputHandler = GetComponent<InputHandler>();
         PlayerAnimator = GetComponent<Animator>();
+        playerClimb = GetComponent<PlayerClimbFixed>();
 
         if (playerHealthManager == null)
         {
@@ -88,6 +94,9 @@ public class PlayerStateMachine : StateMachine
         {
             raycastLayerMask = Physics.DefaultRaycastLayers;
         }
+        
+        // Store original gravity value
+        originalGravity = gravity;
     }
     
     private void Start()
@@ -105,15 +114,21 @@ public class PlayerStateMachine : StateMachine
         SetCursorLock(true);
         // Mulai dengan state idle
         ChangeState(new IdleState(this));
-    }
-
-    protected override void Update()
+    }    protected override void Update()
     {
         if (Input.GetKeyDown(KeyCode.Escape))
         {
             isCursorLocked = !isCursorLocked;
             SetCursorLock(isCursorLocked);
         }
+        
+        // Kontrol gravitasi untuk testing (G key)
+        if (Input.GetKeyDown(KeyCode.G))
+        {
+            ToggleGravity();
+            Debug.Log($"Gravity {(IsGravityEnabled ? "Enabled" : "Disabled")}");
+        }
+        
         base.Update();
     }
 
@@ -138,6 +153,46 @@ public class PlayerStateMachine : StateMachine
     public void SetMovementInput(Vector3 input)
     {
         MovementInput = input;
+    }
+    
+    /// <summary>
+    /// Mengaktifkan atau mematikan gravitasi pada player.
+    /// </summary>
+    /// <param name="enabled">True untuk mengaktifkan gravitasi, false untuk mematikan</param>
+    public void SetGravityEnabled(bool enabled)
+    {
+        IsGravityEnabled = enabled;
+        if (!enabled)
+        {
+            // Jika gravitasi dimatikan, hentikan velocity vertikal
+            VerticalVelocity = 0f;
+        }
+    }
+    
+    /// <summary>
+    /// Toggle gravitasi on/off.
+    /// </summary>
+    public void ToggleGravity()
+    {
+        SetGravityEnabled(!IsGravityEnabled);
+    }
+    
+    /// <summary>
+    /// Mendapatkan nilai gravitasi yang sedang aktif.
+    /// </summary>
+    /// <returns>Nilai gravitasi saat ini (0 jika dimatikan, nilai asli jika diaktifkan)</returns>
+    public float GetCurrentGravity()
+    {
+        return IsGravityEnabled ? originalGravity : 0f;
+    }
+    
+    /// <summary>
+    /// Mengembalikan gravitasi ke nilai asli dan mengaktifkannya.
+    /// </summary>
+    public void ResetGravity()
+    {
+        gravity = originalGravity;
+        SetGravityEnabled(true);
     }
     
     /// <summary>
