@@ -5,8 +5,14 @@ public class MovementState : PlayerBaseState
     private float groundCheckBuffer = 0.2f;
     private float timeSinceGrounded = 0f;
     private float slopeLimit = 45f;
+    // private float climbDistance = 1f;
+    // private LayerMask climbableLayerMask;
 
-    public MovementState(PlayerStateMachine stateMachine) : base(stateMachine) {}
+    public MovementState(PlayerStateMachine stateMachine)
+        : base(stateMachine)
+    {
+        // climbableLayerMask = LayerMask.GetMask("Climbable");
+    }
 
     public override void Enter()
     {
@@ -17,22 +23,34 @@ public class MovementState : PlayerBaseState
 
     public override void UpdateLogic()
     {
+        // Check for climbable surface before other movement logic
+        if (PlayerStateMachine.CheckForClimbableSurface())
+        {
+            // Debug.Log("Climbable surface detected, switching to climbing state.");
+            PlayerStateMachine.ChangeState(new WallClimbingState(PlayerStateMachine));
+            // return;
+        }
+
         Vector3 movement = GetCameraAdjustedMovement();
-        
+
         float targetSpeed = CalculateSpeedTarget();
         PlayerStateMachine.CurrentSpeed = Mathf.Lerp(
-            PlayerStateMachine.CurrentSpeed, 
-            targetSpeed, 
+            PlayerStateMachine.CurrentSpeed,
+            targetSpeed,
             Time.deltaTime * PlayerStateMachine.Acceleration
         );
 
         float targetRunSpeed = CalculateRunningSpeedTarget();
         float currentRunSpeed = PlayerStateMachine.PlayerAnimator.GetFloat("runspeed");
         PlayerStateMachine.PlayerAnimator.SetFloat(
-            "runspeed", 
-            Mathf.Lerp(currentRunSpeed, targetRunSpeed, Time.deltaTime * PlayerStateMachine.Acceleration)
+            "runspeed",
+            Mathf.Lerp(
+                currentRunSpeed,
+                targetRunSpeed,
+                Time.deltaTime * PlayerStateMachine.Acceleration
+            )
         );
-        
+
         ApplyGravity();
         MoveCharacter(movement, PlayerStateMachine.CurrentSpeed);
         RotateTowardsMovementDirection(movement);
@@ -61,7 +79,10 @@ public class MovementState : PlayerBaseState
         }
 
         // Tambahkan deteksi input serang untuk akses substatemachine meele
-        if (PlayerStateMachine.InputHandler != null && PlayerStateMachine.InputHandler.IsAttackPressed())
+        if (
+            PlayerStateMachine.InputHandler != null
+            && PlayerStateMachine.InputHandler.IsAttackPressed()
+        )
         {
             PlayerStateMachine.PlayerAnimator.CrossFadeInFixedTime("meele", 0.1f);
             PlayerStateMachine.InputHandler.ResetAttackPressed();
@@ -84,22 +105,23 @@ public class MovementState : PlayerBaseState
         {
             return PlayerStateMachine.RunSpeed;
         }
-        
-        return PlayerStateMachine.WalkScene ? 
-            PlayerStateMachine.WalkSpeed : 
-            PlayerStateMachine.SlowRunSpeed;
+
+        return PlayerStateMachine.WalkScene
+            ? PlayerStateMachine.WalkSpeed
+            : PlayerStateMachine.SlowRunSpeed;
     }
-    
-    
+
     private float CalculateRunningSpeedTarget()
     {
         if (PlayerStateMachine.IsRunning && !PlayerStateMachine.WalkScene)
         {
             return 2f;
         }
-        else if (PlayerStateMachine.CurrentSpeed <= PlayerStateMachine.SlowRunSpeed &&
-                 PlayerStateMachine.CurrentSpeed >= PlayerStateMachine.WalkSpeed && 
-                 !PlayerStateMachine.WalkScene)
+        else if (
+            PlayerStateMachine.CurrentSpeed <= PlayerStateMachine.SlowRunSpeed
+            && PlayerStateMachine.CurrentSpeed >= PlayerStateMachine.WalkSpeed
+            && !PlayerStateMachine.WalkScene
+        )
         {
             return 1f;
         }
@@ -118,7 +140,7 @@ public class MovementState : PlayerBaseState
         else
         {
             timeSinceGrounded += Time.deltaTime;
-            
+
             if (IsOnSlope())
             {
                 timeSinceGrounded = 0f;
@@ -141,4 +163,35 @@ public class MovementState : PlayerBaseState
         }
         return false;
     }
+
+    // private bool CheckForClimbableSurface()
+    // {
+    //     RaycastHit hit;
+    //     Vector3 rayOrigin =
+    //         PlayerStateMachine.transform.position
+    //         + Vector3.up * (PlayerStateMachine.Controller.height * 0.5f);
+
+    //     // Check if there's a climbable surface in front and player is pressing climb
+    //     if (
+    //         Physics.Raycast(
+    //             rayOrigin,
+    //             PlayerStateMachine.transform.forward,
+    //             out hit,
+    //             climbDistance,
+    //             climbableLayerMask
+    //         )
+    //     )
+    //     {
+    //         if (
+    //             PlayerStateMachine.InputHandler != null
+    //             && PlayerStateMachine.InputHandler.IsClimbPressed()
+    //         )
+    //         {
+    //             PlayerStateMachine.InputHandler.ResetClimbPressed();
+    //             return true;
+    //         }
+    //     }
+
+    //     return false;
+    // }
 }

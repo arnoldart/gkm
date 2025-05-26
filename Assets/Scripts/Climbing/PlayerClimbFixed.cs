@@ -19,7 +19,7 @@ public class PlayerClimbFixed : MonoBehaviour
     private LayerMask climbableLayerMask = 1;
 
     [SerializeField]
-    private float additionalOffset = 0.02f; // Small buffer to prevent clipping
+    private float additionalOffset = 0.02f;
 
     [SerializeField]
     private bool showDebugGizmos = true;

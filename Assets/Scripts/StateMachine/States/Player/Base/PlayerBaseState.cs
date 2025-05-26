@@ -158,4 +158,36 @@ public abstract class PlayerBaseState : State
             normalizedTime
         );
     }
+
+    public bool CheckForClimbableSurface()
+    {
+        RaycastHit hit;
+        Vector3 rayOrigin = PlayerStateMachine.transform.position + Vector3.up * (PlayerStateMachine.Controller.height * 0.5f);
+
+        // Debug raycast visualization
+        // Debug.DrawRay(rayOrigin, transform.forward * climbDistance, Color.yellow, 0.5f);
+
+        // Check if there's a climbable surface in front and player is pressing climb
+        if (
+            Physics.Raycast(
+                rayOrigin,
+                PlayerStateMachine.transform.forward,
+                out hit,
+                PlayerStateMachine.climbDistance,
+                PlayerStateMachine.climbableLayerMask
+            )
+        )
+        {
+            // Draw a green line to the hit point for debug
+            // Debug.DrawLine(rayOrigin, hit.point, Color.green, 0.5f);
+
+            if (PlayerStateMachine.InputHandler != null && PlayerStateMachine.InputHandler.IsClimbPressed())
+            {
+                PlayerStateMachine.InputHandler.ResetClimbPressed();
+                return true;
+            }
+        }
+
+        return false;
+    }
 }

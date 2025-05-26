@@ -58,6 +58,15 @@ public class PlayerStateMachine : StateMachine
     [SerializeField]
     private LayerMask raycastLayerMask = -1; // Default to all layers
 
+    [Header("Climbing Settings")]
+    [SerializeField]
+    private float groundCheckBuffer = 0.2f;
+    private float timeSinceGrounded = 0f;
+    public float climbDistance = 1f;
+
+    [SerializeField]
+    public LayerMask climbableLayerMask;
+
     // Core Components
     public CharacterController Controller { get; private set; }
     public InputHandler InputHandler { get; private set; }

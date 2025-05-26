@@ -8,7 +8,8 @@ using UnityEngine.InputSystem;
 public class InputHandler : MonoBehaviour
 {
     private PlayerInputActions playerInputActions;
-    private PlayerStateMachine playerStateMachine;    public bool AttackPressed { get; private set; }
+    private PlayerStateMachine playerStateMachine;
+    public bool AttackPressed { get; private set; }
     public bool FirePressed { get; private set; }
     public bool AimPressed { get; private set; }
     public bool ClimbPressed { get; private set; }
@@ -34,10 +35,11 @@ public class InputHandler : MonoBehaviour
         playerInputActions.WeaponShortcut.AIM.performed += OnAim;
         playerInputActions.WeaponShortcut.AIM.canceled += OnAim;
         playerInputActions.Gameplay.Heal.performed += OnHeal;
-        playerInputActions.Gameplay.Heal.canceled += OnHeal;        playerInputActions.Gameplay.Attack.performed += OnAttack;
+        playerInputActions.Gameplay.Heal.canceled += OnHeal;
+        playerInputActions.Gameplay.Attack.performed += OnAttack;
         playerInputActions.WeaponShortcut.Fire.performed += OnFire;
         playerInputActions.WeaponShortcut.Fire.canceled += OnFire;
-        
+
         // Add climb input binding (assuming E key is mapped in input actions)
         // If not available in input actions, we'll handle it manually
     }
@@ -57,7 +59,7 @@ public class InputHandler : MonoBehaviour
         playerInputActions.Gameplay.Attack.performed -= OnAttack;
         playerInputActions.WeaponShortcut.Fire.performed -= OnFire;
         playerInputActions.WeaponShortcut.Fire.canceled -= OnFire;
-        
+
         // Nonaktifkan tindakan input
         playerInputActions.Gameplay.Disable();
         playerInputActions.WeaponShortcut.Disable();
@@ -123,11 +125,13 @@ public class InputHandler : MonoBehaviour
         {
             playerStateMachine.PlayerHealthManager.HealPlayer();
         }
-    }    private void OnAttack(InputAction.CallbackContext context)
+    }
+
+    private void OnAttack(InputAction.CallbackContext context)
     {
         AttackPressed = context.performed;
     }
-    
+
     // Handle climb input manually for now (E key)
     private void Update()
     {
@@ -136,31 +140,34 @@ public class InputHandler : MonoBehaviour
         {
             ClimbPressed = true;
         }
-    }    public bool IsAttackPressed()
+    }
+
+    public bool IsAttackPressed()
     {
         return AttackPressed;
     }
-    
+
     public bool IsFirePressed()
     {
         return FirePressed;
     }
-    
+
     public bool IsClimbPressed()
     {
         return ClimbPressed;
-    }    // Reset AttackPressed setiap frame (bisa dipanggil dari PlayerStateMachine setelah update logic)
+    } // Reset AttackPressed setiap frame (bisa dipanggil dari PlayerStateMachine setelah update logic)
+
     public void ResetAttackPressed()
     {
         AttackPressed = false;
     }
-    
+
     // Reset FirePressed setiap frame
     public void ResetFirePressed()
     {
         FirePressed = false;
     }
-    
+
     // Reset ClimbPressed setiap frame
     public void ResetClimbPressed()
     {
