@@ -7,16 +7,24 @@ using UnityEngine;
 public class GravityController : MonoBehaviour
 {
     [Header("Gravity Zone Settings")]
-    [SerializeField] private bool disableGravityOnEnter = true;
-    [SerializeField] private bool enableGravityOnExit = true;
-    [SerializeField] private bool isGravityZone = false;
-    
+    [SerializeField]
+    private bool disableGravityOnEnter = true;
+
+    [SerializeField]
+    private bool enableGravityOnExit = true;
+
+    [SerializeField]
+    private bool isGravityZone = false;
+
     [Header("Manual Control")]
-    [SerializeField] private KeyCode toggleKey = KeyCode.H;
-    [SerializeField] private bool enableManualControl = true;
-    
+    [SerializeField]
+    private KeyCode toggleKey = KeyCode.H;
+
+    [SerializeField]
+    private bool enableManualControl = true;
+
     private PlayerStateMachine playerStateMachine;
-    
+
     private void Start()
     {
         // Cari PlayerStateMachine di scene
@@ -26,7 +34,7 @@ public class GravityController : MonoBehaviour
             Debug.LogWarning("PlayerStateMachine tidak ditemukan di scene!");
         }
     }
-    
+
     private void Update()
     {
         // Manual control untuk testing
@@ -35,7 +43,7 @@ public class GravityController : MonoBehaviour
             ToggleGravity();
         }
     }
-    
+
     /// <summary>
     /// Toggle gravitasi on/off.
     /// </summary>
@@ -44,10 +52,12 @@ public class GravityController : MonoBehaviour
         if (playerStateMachine != null)
         {
             playerStateMachine.ToggleGravity();
-            Debug.Log($"Gravity {(playerStateMachine.IsGravityEnabled ? "Enabled" : "Disabled")} by GravityController");
+            Debug.Log(
+                $"Gravity {(playerStateMachine.IsGravityEnabled ? "Enabled" : "Disabled")} by GravityController"
+            );
         }
     }
-    
+
     /// <summary>
     /// Mengaktifkan gravitasi.
     /// </summary>
@@ -59,7 +69,7 @@ public class GravityController : MonoBehaviour
             Debug.Log("Gravity Enabled by GravityController");
         }
     }
-    
+
     /// <summary>
     /// Mematikan gravitasi.
     /// </summary>
@@ -71,7 +81,7 @@ public class GravityController : MonoBehaviour
             Debug.Log("Gravity Disabled by GravityController");
         }
     }
-    
+
     /// <summary>
     /// Reset gravitasi ke nilai asli.
     /// </summary>
@@ -83,12 +93,13 @@ public class GravityController : MonoBehaviour
             Debug.Log("Gravity Reset by GravityController");
         }
     }
-    
+
     // Trigger events untuk area/zone based gravity control
     private void OnTriggerEnter(Collider other)
     {
-        if (!isGravityZone) return;
-        
+        if (!isGravityZone)
+            return;
+
         if (other.CompareTag("Player"))
         {
             if (disableGravityOnEnter)
@@ -98,11 +109,12 @@ public class GravityController : MonoBehaviour
             }
         }
     }
-    
+
     private void OnTriggerExit(Collider other)
     {
-        if (!isGravityZone) return;
-        
+        if (!isGravityZone)
+            return;
+
         if (other.CompareTag("Player"))
         {
             if (enableGravityOnExit)
@@ -112,7 +124,7 @@ public class GravityController : MonoBehaviour
             }
         }
     }
-    
+
     // Method untuk dipanggil dari script lain atau UI
     public void SetGravityState(bool enabled)
     {
