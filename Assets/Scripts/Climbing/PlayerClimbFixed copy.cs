@@ -6,7 +6,7 @@ using UnityEditor;
 #endif
 
 [RequireComponent(typeof(CharacterController))]
-public class PlayerClimbFixed : MonoBehaviour
+public class PlayerClimbFixedCopy : MonoBehaviour
 {
     [Header("Climbing Settings")]
     [SerializeField]
@@ -24,43 +24,41 @@ public class PlayerClimbFixed : MonoBehaviour
     [SerializeField]
     private bool showDebugGizmos = true;
 
-    // [Header("Gravity Settings")]
-    // [SerializeField]
-    // private float gravityStrength = 9.81f;
+    [Header("Gravity Settings")]
+    [SerializeField]
+    private float gravityStrength = 9.81f;
 
     [Header("Status (Read Only)")]
     [SerializeField]
     private bool isClimbing = false;
 
-    // private CharacterController controller;
+    private CharacterController controller;
     private Vector3 lastClimbNormal;
     private GameObject currentClimbableObject;
-    private PlayerStateMachine playerStateMachine;
 
     void Start()
     {
-        // controller = GetComponent<CharacterController>();
-        playerStateMachine = GetComponent<PlayerStateMachine>();
+        controller = GetComponent<CharacterController>();
 
-        if (playerStateMachine.Controller == null)
+        if (controller == null)
         {
             Debug.LogError("PlayerClimb requires a CharacterController component!");
         }
     }
 
-    // void Update()
-    // {
-    //     HandleClimbing();
-    // }
+    void Update()
+    {
+        HandleClimbing();
+    }
 
     void HandleClimbing()
     {
-        // float h = Input.GetAxis("Horizontal");
-        // float v = Input.GetAxis("Vertical");
-        // Vector2 input = SquareToCircle(new Vector2(h, v));
+        float h = Input.GetAxis("Horizontal");
+        float v = Input.GetAxis("Vertical");
+        Vector2 input = SquareToCircle(new Vector2(h, v));
 
         RaycastHit hit;
-        Vector3 rayOrigin = transform.position + Vector3.up * (playerStateMachine.Controller.height * 0.5f);
+        Vector3 rayOrigin = transform.position + Vector3.up * (controller.height * 0.5f);
 
         // Check if there's a climbable surface in front
         if (
@@ -73,15 +71,13 @@ public class PlayerClimbFixed : MonoBehaviour
             )
         )
         {
-            if (!isClimbing && Input.GetKey(KeyCode.E))
+            if (!isClimbing)
             {
-                playerStateMachine.enabled = false;
-                playerStateMachine.SetGravityEnabled(false);
                 StartClimbing(hit);
             }
 
             // Update climbing
-            // UpdateClimbing(input, hit);
+            UpdateClimbing(input, hit);
         }
         else if (isClimbing)
         {
@@ -89,10 +85,10 @@ public class PlayerClimbFixed : MonoBehaviour
         }
 
         // If not climbing, apply gravity
-        // if (!isClimbing)
-        // {
-        //     ApplyGravity();
-        // }
+        if (!isClimbing)
+        {
+            ApplyGravity();
+        }
     }
 
     void StartClimbing(RaycastHit hit)
@@ -109,9 +105,9 @@ public class PlayerClimbFixed : MonoBehaviour
 
         // Position player at the calculated distance from the wall
         Vector3 targetPosition = hit.point + hit.normal * optimalDistance;
-        playerStateMachine.Controller.enabled = false;
+        controller.enabled = false;
         transform.position = new Vector3(targetPosition.x, transform.position.y, targetPosition.z);
-        playerStateMachine.Controller.enabled = true;
+        controller.enabled = true;
 
         Debug.Log(
             $"Started climbing on: {currentClimbableObject.name} at distance: {optimalDistance:F3}"
@@ -131,7 +127,7 @@ public class PlayerClimbFixed : MonoBehaviour
         Vector3 moveDirection = (rightDirection * input.x + upDirection * input.y) * climbSpeed;
 
         // Move the character
-        playerStateMachine.Controller.Move(moveDirection * Time.deltaTime);
+        controller.Move(moveDirection * Time.deltaTime);
 
         // Calculate optimal distance and keep player stuck to the wall
         float optimalDistance = CalculateOptimalStickDistance(hit);
@@ -139,9 +135,9 @@ public class PlayerClimbFixed : MonoBehaviour
         Vector3 currentPos = transform.position;
         Vector3 stickPosition = new Vector3(targetPosition.x, currentPos.y, targetPosition.z);
 
-        playerStateMachine.Controller.enabled = false;
+        controller.enabled = false;
         transform.position = Vector3.Lerp(currentPos, stickPosition, 10f * Time.deltaTime);
-        playerStateMachine.Controller.enabled = true;
+        controller.enabled = true;
     }
 
     void StopClimbing()
@@ -151,12 +147,12 @@ public class PlayerClimbFixed : MonoBehaviour
         Debug.Log("Stopped climbing");
     }
 
-    // void ApplyGravity()
-    // {
-    //     // Simple gravity application
-    //     Vector3 gravity = Vector3.down * gravityStrength * Time.deltaTime;
-    //     playerStateMachine.Controller.Move(gravity);
-    // }
+    void ApplyGravity()
+    {
+        // Simple gravity application
+        Vector3 gravity = Vector3.down * gravityStrength * Time.deltaTime;
+        controller.Move(gravity);
+    }
 
     Vector2 SquareToCircle(Vector2 input)
     {
@@ -170,7 +166,7 @@ public class PlayerClimbFixed : MonoBehaviour
     float CalculateOptimalStickDistance(RaycastHit hit)
     {
         // Base distance is the character controller radius
-        float baseDistance = playerStateMachine.Controller.radius;
+        float baseDistance = controller.radius;
 
         // Get the collider type and adjust accordingly
         Collider hitCollider = hit.collider;
@@ -220,12 +216,12 @@ public class PlayerClimbFixed : MonoBehaviour
         // Cast multiple rays around the hit point to understand the surface better
         Vector3 hitPoint = hit.point;
         Vector3 normal = hit.normal;
-        float baseDistance = playerStateMachine.Controller.radius;
+        float baseDistance = controller.radius;
 
         // Cast rays in a small pattern around the hit point
         float minDistance = float.MaxValue;
         int rayCount = 5;
-        float raySpread = playerStateMachine.Controller.radius * 0.5f;
+        float raySpread = controller.radius * 0.5f;
 
         for (int i = 0; i < rayCount; i++)
         {

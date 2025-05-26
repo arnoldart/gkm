@@ -1,16 +1,8 @@
 using UnityEngine;
 
-public class WallClimbingState : MonoBehaviour
+public class WallClimbingState : PlayerBaseState
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    public WallClimbingState(PlayerStateMachine stateMachine) : base(stateMachine)
     {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
     }
 }

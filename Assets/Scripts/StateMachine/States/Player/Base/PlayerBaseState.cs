@@ -66,6 +66,28 @@ public abstract class PlayerBaseState : State
         PlayerStateMachine.Controller.Move(moveVelocity * Time.deltaTime);
     }
 
+    protected void MoveCharacterWithVector2(Vector2 movement, float speedMultiplier)
+    {
+        if (movement.magnitude == 0)
+        {
+            return;
+        }
+
+        if (movement.magnitude > 1f)
+        {
+            movement.Normalize();
+        }
+
+        // Hitung kecepatan berjalan
+        Vector3 moveVelocity = new Vector3(movement.x, 0, movement.y) * speedMultiplier;
+
+        // Tambahkan vektor vertikal (gravitasi/lompatan)
+        moveVelocity.y = PlayerStateMachine.VerticalVelocity;
+
+        // Gerakkan karakter
+        PlayerStateMachine.Controller.Move(moveVelocity * Time.deltaTime);
+    }
+
     /// <summary>
     /// Mendapatkan vektor gerakan yang disesuaikan dengan orientasi kamera.
     /// </summary>
