@@ -37,8 +37,7 @@ public class PlayerStateMachine : StateMachine
     public InputHandler InputHandler { get; private set; }
     public Camera PlayerCamera => playerCamera;
     public Animator PlayerAnimator { get; private set; }
-    
-    // Variabel state
+      // Variabel state
     public float CurrentSpeed { get; set; }
     public Vector3 MovementInput { get; set; }
     public float VerticalVelocity { get; set; }
@@ -47,6 +46,9 @@ public class PlayerStateMachine : StateMachine
     public bool IsAiming { get; set; }
     public bool IsHealing { get; set; }
     private bool isCursorLocked = true;
+    
+    // Flag untuk mencegah komponen lain mengoverride CharacterController
+    public bool PreventControllerOverride { get; set; } = false;
     
     // Weapon State
     private float lastFireTime = 0f;

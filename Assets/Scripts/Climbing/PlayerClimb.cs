@@ -114,9 +114,14 @@ public class PlayerClimb : MonoBehaviour
                 }
             }
         }
-    }
-    private void StateConditionsCheck()
+    }    private void StateConditionsCheck()
     {
+        // Jangan override Controller.enabled jika ada state lain yang sedang mengaturnya
+        if (thirdPersonController.PreventControllerOverride)
+        {
+            return;
+        }
+        
         if (playerState == PlayerState.NormalState)
         {
             animator.applyRootMotion = false;
