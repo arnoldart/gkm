@@ -406,4 +406,6 @@ public class LedgeDetector : MonoBehaviour
             }
         }
     }
+
+    public LayerMask GetLedgeMask() { return ledgeMask; }
 }

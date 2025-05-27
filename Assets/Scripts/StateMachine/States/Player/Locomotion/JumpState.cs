@@ -1,4 +1,6 @@
 using UnityEngine;
+using Climbing;
+using Player.Locomotion;
 
 /// <summary>
 /// State untuk ketika pemain melompat (bergerak ke atas).
@@ -25,6 +27,16 @@ public class JumpState : PlayerBaseState
 
     public override void UpdateLogic()
     {
+        // Deteksi ledge saat di udara
+        if (PlayerStateMachine.LedgeDetector != null && PlayerStateMachine.LedgeDetector.DetectLedges())
+        {
+            var ledge = PlayerStateMachine.LedgeDetector.GetBestLedge();
+            if (ledge != null && ledge.grabPoint != null)
+            {
+                PlayerStateMachine.ChangeState(new LedgeGrabState(PlayerStateMachine, ledge));
+                return;
+            }
+        }
         // Terapkan momentum horizontal (tanpa Y) dengan decay
         Vector3 momentumMovement = PlayerStateMachine.JumpMomentum * PlayerStateMachine.JumpMomentumMultiplier;
         momentumMovement.y = 0f;

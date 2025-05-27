@@ -32,6 +32,9 @@ public class PlayerStateMachine : StateMachine
     [SerializeField] private float raycastMaxDistance = 100f;
     [SerializeField] private LayerMask raycastLayerMask = -1; // Default to all layers
     
+    [SerializeField] private LedgeDetector ledgeDetector;
+    public LedgeDetector LedgeDetector => ledgeDetector;
+    
     // Properties
     public CharacterController Controller { get; private set; }
     public InputHandler InputHandler { get; private set; }
@@ -87,6 +90,15 @@ public class PlayerStateMachine : StateMachine
         if (raycastLayerMask == -1)
         {
             raycastLayerMask = Physics.DefaultRaycastLayers;
+        }
+
+        if (ledgeDetector == null)
+        {
+            ledgeDetector = GetComponent<LedgeDetector>();
+            if (ledgeDetector == null)
+            {
+                Debug.LogWarning("LedgeDetector tidak ditemukan pada player!");
+            }
         }
     }
     

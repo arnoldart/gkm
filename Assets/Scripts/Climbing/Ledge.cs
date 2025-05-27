@@ -74,6 +74,17 @@ namespace Climbing
                 return GetClosestPoint(hitPoint, Vector3.zero);
             }
 
+            public Transform GetAdjacentGrabPoint(Transform current, int direction)
+            {
+                // direction: -1 = left, 1 = right
+                if (grabPoints.Count < 2 || current == null) return null;
+                int idx = grabPoints.IndexOf(current);
+                if (idx == -1) return null;
+                int newIdx = idx + direction;
+                if (newIdx < 0 || newIdx >= grabPoints.Count) return null;
+                return grabPoints[newIdx];
+            }
+
     #if UNITY_EDITOR
             private void OnDrawGizmos()
             {
