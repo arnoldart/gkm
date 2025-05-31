@@ -1287,7 +1287,7 @@ PrefabInstance:
   m_SourcePrefab: {fileID: 100100000, guid: 75884070f3b6c5249a1108fcdbb3a1c1, type: 3}
 --- !u!43 &312376426
 Mesh:
-  m_ObjectHideFlags: 0
+  m_ObjectHideFlags: 32
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
@@ -1858,7 +1858,7 @@ CanvasRenderer:
   m_CullTransparentMesh: 1
 --- !u!43 &482114381
 Mesh:
-  m_ObjectHideFlags: 0
+  m_ObjectHideFlags: 32
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
@@ -2375,7 +2375,7 @@ Transform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!43 &708424072
 Mesh:
-  m_ObjectHideFlags: 0
+  m_ObjectHideFlags: 32
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
@@ -2796,7 +2796,7 @@ PrefabInstance:
   m_SourcePrefab: {fileID: 100100000, guid: 45fdf3c08e0aae54993f8e1d2fbe085a, type: 3}
 --- !u!43 &897375121
 Mesh:
-  m_ObjectHideFlags: 0
+  m_ObjectHideFlags: 32
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
@@ -3094,7 +3094,7 @@ PrefabInstance:
   m_SourcePrefab: {fileID: 100100000, guid: 75884070f3b6c5249a1108fcdbb3a1c1, type: 3}
 --- !u!43 &948010039
 Mesh:
-  m_ObjectHideFlags: 0
+  m_ObjectHideFlags: 32
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
@@ -3648,7 +3648,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
 --- !u!43 &1217611544
 Mesh:
-  m_ObjectHideFlags: 0
+  m_ObjectHideFlags: 32
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
@@ -5556,7 +5556,7 @@ RectTransform:
   m_PrefabAsset: {fileID: 0}
 --- !u!43 &2004085715
 Mesh:
-  m_ObjectHideFlags: 0
+  m_ObjectHideFlags: 32
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}

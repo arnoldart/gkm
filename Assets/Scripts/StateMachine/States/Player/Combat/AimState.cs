@@ -51,31 +51,33 @@ public class AimState : PlayerBaseState
                 }
             }
         }
-    }    public override void UpdateLogic()
+    }
+
+    public override void UpdateLogic()
     {
         // Terapkan gravitasi
         ApplyGravity();
-        
+
         // Gerakan terbatas saat membidik
         Vector3 movement = GetCameraAdjustedMovement() * 0.5f; // Gerakan lebih lambat saat membidik
         MoveCharacter(movement, PlayerStateMachine.WalkSpeed);
-        
+
         // Karakter selalu menghadap ke arah kamera saat membidik
         AlignWithCamera();
-        
+
         // Periksa apakah pemain menekan tombol Fire
         if (PlayerStateMachine.InputHandler != null && PlayerStateMachine.InputHandler.IsFirePressed())
         {
             // Gunakan method FireWeapon dari PlayerStateMachine
             bool fired = PlayerStateMachine.FireWeapon();
-            
+
             if (fired)
             {
                 // Reset status FirePressed setelah berhasil menembak
                 PlayerStateMachine.InputHandler.ResetFirePressed();
             }
         }
-        
+
         // Periksa apakah pemain masih ingin membidik
         if (!PlayerStateMachine.IsAiming)
         {
@@ -83,7 +85,7 @@ public class AimState : PlayerBaseState
             PlayerStateMachine.ChangeState(new IdleState(PlayerStateMachine));
             return;
         }
-        
+
         // Tangani transisi ke state lain
         if (PlayerStateMachine.JumpTriggered && PlayerStateMachine.Controller.isGrounded)
         {
@@ -91,7 +93,7 @@ public class AimState : PlayerBaseState
             PlayerStateMachine.ConsumeJumpTrigger();
             return;
         }
-        
+
         if (!PlayerStateMachine.Controller.isGrounded)
         {
             PlayerStateMachine.ChangeState(new FallingState(PlayerStateMachine));
