@@ -868,6 +868,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 4583734758034279256, guid: 98896ff1f8fa366488a67ac2a16260de, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1207914443}
+    - targetCorrespondingSourceObject: {fileID: 4583734758034279256, guid: 98896ff1f8fa366488a67ac2a16260de, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1207914444}
     - targetCorrespondingSourceObject: {fileID: 6016217725380905566, guid: 98896ff1f8fa366488a67ac2a16260de, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1765461579}
@@ -3907,6 +3910,24 @@ MonoBehaviour:
   detectionMethod: 1
   sphereDetectionRadius: 1.5
   interactionPrompt: {fileID: 1270508188}
+--- !u!114 &1207914444
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 135094689}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9b7122504af8aed4fb972f218e2a151f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sphereRadius: 0.05
+  sphereGap: 0.4
+  rayHeight: 1.6
+  rayLength: 1
+  canMoveLeft: 0
+  canMoveRight: 0
 --- !u!43 &1217611544
 Mesh:
   m_ObjectHideFlags: 32
@@ -6381,21 +6402,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3664c98eb17d87b4c95d63145d37bb09, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  useTextMeshPro: 1
-  defaultText: Press E to interact
-  canvasScale: 0.01
-  backgroundSize: {x: 200, y: 60}
-  fontSize: 24
-  textColor:
-    r: 1
-    g: 1
-    b: 1
-    a: 1
-  backgroundColor:
-    r: 0
-    g: 0
-    b: 0
-    a: 0.7
 --- !u!4 &2017580100
 Transform:
   m_ObjectHideFlags: 0
