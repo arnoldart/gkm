@@ -19,7 +19,7 @@ public class ShimmyController : MonoBehaviour
     public float horizontalInput;
     public float horizontalValue;
 
-    RaycastHit ledgeHit;
+    public RaycastHit ledgeHit;
 
     void Start()
     {

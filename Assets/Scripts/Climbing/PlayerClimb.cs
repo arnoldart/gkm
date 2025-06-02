@@ -6,7 +6,7 @@ public enum PlayerState { NormalState, ClimbingState }
 public class PlayerClimb : MonoBehaviour
 {
     public PlayerStateMachine thirdPersonController;
-    // RoofLedgeDetection roofLedgeDetection;
+    RoofLedgeDetection roofLedgeDetection;
     public Animator animator;
 
     [Header("Climbing")]
@@ -45,7 +45,7 @@ public class PlayerClimb : MonoBehaviour
         playerState = PlayerState.NormalState;
         thirdPersonController = GetComponent<PlayerStateMachine>();
         animator = GetComponent<Animator>();
-        // roofLedgeDetection = GetComponent<RoofLedgeDetection>();
+        roofLedgeDetection = GetComponent<RoofLedgeDetection>();
     }
 
     private void Update()
@@ -148,28 +148,30 @@ public class PlayerClimb : MonoBehaviour
         }
 
         // Drop To Hang Ledge Target Match
-        // if (animator.GetCurrentAnimatorStateInfo(0).IsName("Drop To FreeHang") && !animator.IsInTransition(0))
-        // {
-        //     Vector3 handDropPos = transform.forward * zDropToHangPos + transform.up * yDropToHangPos;
-        //     animator.MatchTarget(roofLedgeDetection.rayLedgeFwdHit.point + handDropPos, transform.rotation, AvatarTarget.LeftHand, new MatchTargetWeightMask(new Vector3(0, 1, 1), 0), 0.65f, 0.71f);
-        // }
+        if (animator.GetCurrentAnimatorStateInfo(0).IsName("Drop To FreeHang") && !animator.IsInTransition(0))
+        {
+            Vector3 handDropPos = transform.forward * zDropToHangPos + transform.up * yDropToHangPos;
+            animator.MatchTarget(roofLedgeDetection.rayLedgeFwdHit.point + handDropPos, transform.rotation, AvatarTarget.LeftHand, new MatchTargetWeightMask(new Vector3(0, 1, 1), 0), 0.65f, 0.71f);
+        }
 
         /////////////////////////////////////
         // Hop Up Target Match
-        // if (animator.GetCurrentAnimatorStateInfo(0).IsName("Braced Hang Hop Up") && !animator.IsInTransition(0))
-        // {
-        //     Vector3 handDropPos = transform.forward * frowardHopPos + transform.up * upHopPos;
-        //     animator.MatchTarget(hopLedgeDownHit.point + handDropPos, transform.rotation, AvatarTarget.LeftHand, new MatchTargetWeightMask(new Vector3(0, 1, 1), 0), 0.39f, 0.59f);
-        // }
+        if (animator.GetCurrentAnimatorStateInfo(0).IsName("Braced Hang Hop Up") && !animator.IsInTransition(0))
+        {
+            Vector3 handDropPos = transform.forward * frowardHopPos + transform.up * upHopPos;
+            animator.MatchTarget(hopLedgeDownHit.point + handDropPos, transform.rotation, AvatarTarget.LeftHand, new MatchTargetWeightMask(new Vector3(0, 1, 1), 0), 0.39f, 0.59f);
+        }
 
 
         // Hop Down Target Match
-        // if (animator.GetCurrentAnimatorStateInfo(0).IsName("HopDown") && !animator.IsInTransition(0))
-        // {
-        //     Vector3 handDropPos = transform.forward * frowardHopPos + transform.up * upHopPos;
-        //     animator.MatchTarget(hopLedgeDownHit.point + handDropPos, transform.rotation, AvatarTarget.LeftHand, new MatchTargetWeightMask(new Vector3(0, 1, 1), 0), 0.31f, 0.56f);
-        // }
+        if (animator.GetCurrentAnimatorStateInfo(0).IsName("HopDown") && !animator.IsInTransition(0))
+        {
+            Vector3 handDropPos = transform.forward * frowardHopPos + transform.up * upHopPos;
+            animator.MatchTarget(hopLedgeDownHit.point + handDropPos, transform.rotation, AvatarTarget.LeftHand, new MatchTargetWeightMask(new Vector3(0, 1, 1), 0), 0.31f, 0.56f);
+        }
     }
+
+    [Header("Hop Up Down Settings")]
 
     float verticalInp;
     public float rayHopOffset = 0.1f;

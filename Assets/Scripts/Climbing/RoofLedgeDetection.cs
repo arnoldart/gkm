@@ -32,11 +32,11 @@ public class RoofLedgeDetection : MonoBehaviour
                 if (Physics.Raycast(rayPos, Vector3.down, out rayLedgeDwnHit, rayLength, playerClimbScript.ledgeLayer))
                 {
                     isRoofLedgeDetected = true;
-                    //Debug.DrawRay(rayLedgeDwnHit.point + transform.forward * 0.5f, -transform.forward * 1, Color.yellow);
+                    Debug.DrawRay(rayLedgeDwnHit.point + transform.forward * 0.5f, -transform.forward * 1, Color.yellow);
                     if (Physics.Raycast(rayLedgeDwnHit.point + rayLedgeDwnHit.transform.forward * 0.5f, -rayLedgeDwnHit.transform.forward, out rayLedgeFwdHit, 1, playerClimbScript.ledgeLayer))
                     {
                         
-                        if (Input.GetKeyDown(KeyCode.C) && rayLedgeFwdHit.point != Vector3.zero)
+                        if (Input.GetKeyDown(KeyCode.Z) && rayLedgeFwdHit.point != Vector3.zero)
                         {
                             StartCoroutine(DropToLedgeHang());
                         }
