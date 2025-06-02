@@ -55,8 +55,6 @@ public class FreeLookAIM : MonoBehaviour
         targetFOV = isAiming ? aimFOV : normalFOV;
         targetOffset = isAiming ? aimTrackedOffset : normalOffset;
 
-        Debug.Log(isAiming);    
-
         if (freeLookCamera.m_Lens.FieldOfView != targetFOV)
         {
             freeLookCamera.m_Lens.FieldOfView = Mathf.Lerp(

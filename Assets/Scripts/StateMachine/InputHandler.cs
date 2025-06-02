@@ -7,17 +7,18 @@ public enum InputType
 {
     Attack,
     Fire,
-    Aim
+    Aim,
+    Interact
 }
 public class InputHandler : MonoBehaviour
 {
     private PlayerInputActions playerInputActions;
     private PlayerStateMachine playerStateMachine;
     public InputType InputType { get; private set; }
-
     public bool AttackPressed { get; private set; }
     public bool FirePressed { get; private set; }
     public bool AimPressed { get; private set; }
+    public bool InteractPressed { get; private set; }
 
     private void Awake()
     {
@@ -31,40 +32,45 @@ public class InputHandler : MonoBehaviour
         playerInputActions.Gameplay.Enable();
         playerInputActions.WeaponShortcut.Enable();
 
-        // Daftarkan callback event
+        // Gameplay actions
         playerInputActions.Gameplay.Move.performed += OnMove;
         playerInputActions.Gameplay.Move.canceled += OnMove;
         playerInputActions.Gameplay.Jump.performed += OnJump;
         playerInputActions.Gameplay.Running.performed += OnRun;
         playerInputActions.Gameplay.Running.canceled += OnRun;
-        playerInputActions.WeaponShortcut.AIM.performed += OnAim;
-        playerInputActions.WeaponShortcut.AIM.canceled += OnAim;
         playerInputActions.Gameplay.Heal.performed += OnHeal;
         playerInputActions.Gameplay.Heal.canceled += OnHeal;
         playerInputActions.Gameplay.Attack.performed += OnAttack;
+        playerInputActions.Gameplay.Interact.performed += OnInteract;
+
+        // Weapon actions
+        playerInputActions.WeaponShortcut.AIM.performed += OnAim;
+        playerInputActions.WeaponShortcut.AIM.canceled += OnAim;
         playerInputActions.WeaponShortcut.Fire.performed += OnFire;
         playerInputActions.WeaponShortcut.Fire.canceled += OnFire;
     }
 
     private void OnDisable()
     {
-        // Batalkan pendaftaran callback event
+        playerInputActions.Gameplay.Disable();
+        playerInputActions.WeaponShortcut.Disable();
+
+        // Gameplay actions
         playerInputActions.Gameplay.Move.performed -= OnMove;
         playerInputActions.Gameplay.Move.canceled -= OnMove;
         playerInputActions.Gameplay.Jump.performed -= OnJump;
         playerInputActions.Gameplay.Running.performed -= OnRun;
         playerInputActions.Gameplay.Running.canceled -= OnRun;
-        playerInputActions.WeaponShortcut.AIM.performed -= OnAim;
-        playerInputActions.WeaponShortcut.AIM.canceled -= OnAim;
         playerInputActions.Gameplay.Heal.performed -= OnHeal;
         playerInputActions.Gameplay.Heal.canceled -= OnHeal;
         playerInputActions.Gameplay.Attack.performed -= OnAttack;
+        playerInputActions.Gameplay.Interact.performed -= OnInteract;
+
+        // Weapon actions
+        playerInputActions.WeaponShortcut.AIM.performed -= OnAim;
+        playerInputActions.WeaponShortcut.AIM.canceled -= OnAim;
         playerInputActions.WeaponShortcut.Fire.performed -= OnFire;
         playerInputActions.WeaponShortcut.Fire.canceled -= OnFire;
-
-        // Nonaktifkan tindakan input
-        playerInputActions.Gameplay.Disable();
-        playerInputActions.WeaponShortcut.Disable();
     }
 
     private void OnMove(InputAction.CallbackContext context)
@@ -106,20 +112,24 @@ public class InputHandler : MonoBehaviour
     private void OnAttack(InputAction.CallbackContext context)
     {
         AttackPressed = context.performed;
-    }
-
-    public bool IsPressed(InputType inputType)
+    }    private void OnInteract(InputAction.CallbackContext context)
+    {
+        InteractPressed = context.performed;
+        if (context.performed)
+        {
+            Debug.Log("Interact button pressed");
+        }
+    }    public bool IsPressed(InputType inputType)
     {
         return inputType switch
         {
             InputType.Attack => AttackPressed,
             InputType.Fire => FirePressed,
             InputType.Aim => AimPressed,
+            InputType.Interact => InteractPressed,
             _ => false
         };
-    }
-
-    public void ResetPressed(InputType inputType)
+    }    public void ResetPressed(InputType inputType)
     {
         switch (inputType)
         {
@@ -132,12 +142,15 @@ public class InputHandler : MonoBehaviour
             case InputType.Aim:
                 AimPressed = false;
                 break;
+            case InputType.Interact:
+                InteractPressed = false;
+                break;
         }
-    }
-
-    // Backward compatibility methods (optional - bisa dihapus jika tidak perlu)
+    }    // Backward compatibility methods (optional - bisa dihapus jika tidak perlu)
     public bool IsAttackPressed() => IsPressed(InputType.Attack);
     public bool IsFirePressed() => IsPressed(InputType.Fire);
+    public bool IsInteractPressed() => IsPressed(InputType.Interact);
     public void ResetAttackPressed() => ResetPressed(InputType.Attack);
     public void ResetFirePressed() => ResetPressed(InputType.Fire);
+    public void ResetInteractPressed() => ResetPressed(InputType.Interact);
 }
